@@ -83,4 +83,13 @@ $ sh make PackageToRebuild_deps
    A : When invoking cmake to prepare your build folder, set the CMAKE_INSTALL_PREFIX variable:
    ```
    $ PATH=$PATH:/Path/To/Layer1:/Path/To/Layer2; cmake -DCMAKE_INSTALL_PREFIX=/My/Install/Prefix /Path/To/Folder/Containing/MyCMakeLists.txt
-   ``` 
+   ```
+   
+ - Q : How can I choose between Release/Debug mode when building the packages ?
+
+   A : You can specify the value of the boolean option called "ENABLE_DEBUG" when invoking cmake::
+   ```
+   $ PATH=$PATH:/Path/To/Layer1:/Path/To/Layer2; cmake -DENABLE_DEBUG=OFF /Path/To/Folder/Containing/MyCMakeLists.txt
+   ```
+   Note that the default value is "ON", which means packages are built in debug mode by default. 
+   

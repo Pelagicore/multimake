@@ -89,7 +89,7 @@ macro(set_package_defined PROJECT)
         on_package_already_defined(${PROJECT})
     endif()
     set(${PROJECT}_DEFINED 1)
-    message("Package defined : ${PROJECT}")
+#    message("Package defined : ${PROJECT}")
 endmacro()
 
 
@@ -101,17 +101,9 @@ endmacro()
 
 macro(add_available_package PROJECT)
     set_package_defined(${PROJECT})
-    
-    message("Package will not be built : ${PROJECT}")
-    	
-    ExternalProject_Add(${PROJECT}
-        DOWNLOAD_COMMAND ""
-        UPDATE_COMMAND ""
-        BUILD_COMMAND ""
-        CONFIGURE_COMMAND ""
-        INSTALL_COMMAND ""
-    )
-    
+
+    add_custom_target(${PROJECT} ALL)
+
 endmacro()
 
 
@@ -166,7 +158,9 @@ set(EXCLUDED_PACKAGES "" CACHE STRING "List of packages to exclude (semi-column 
 
 set(EXCLUDED_PACKAGES_LIST "${EXCLUDED_PACKAGES}")
 
-message("Excluding packages ${EXCLUDED_PACKAGES_LIST}")
+if(${EXCLUDED_PACKAGES_LIST})
+    message("Excluding packages ${EXCLUDED_PACKAGES_LIST}")
+endif()
 
 foreach(APACKAGE ${EXCLUDED_PACKAGES_LIST})
     message("Excluding package ${APACKAGE}")
