@@ -32,7 +32,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             #      UPDATE_COMMAND
             INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
             CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && make -j${PARALLEL_BUILD_JOBS} ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
         )
 
     else()
@@ -45,7 +45,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             #      UPDATE_COMMAND
             INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
             CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && make -j${PARALLEL_BUILD_JOBS} ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
         )
 
     endif()
@@ -81,7 +81,7 @@ macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIE
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS} ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+                BUILD_COMMAND $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
             
@@ -94,7 +94,7 @@ macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIE
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS} ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+                BUILD_COMMAND $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
     
@@ -140,7 +140,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             #      UPDATE_COMMAND
             INSTALL_COMMAND make install ${MAKE_OPTIONS}
             CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && make -j${PARALLEL_BUILD_JOBS} ${MAKE_OPTIONS}
+            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
         )
         
     else()
@@ -153,7 +153,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             #      UPDATE_COMMAND
             INSTALL_COMMAND make install ${MAKE_OPTIONS}
             CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && make -j${PARALLEL_BUILD_JOBS} ${MAKE_OPTIONS}
+            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
         )
         
     endif()
@@ -192,7 +192,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_UR
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 INSTALL_COMMAND make install ${MAKE_OPTIONS}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS} ${MAKE_OPTIONS}
+                BUILD_COMMAND $(MAKE) ${MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
         
@@ -205,7 +205,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_UR
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 INSTALL_COMMAND make install ${MAKE_OPTIONS}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS} ${MAKE_OPTIONS}
+                BUILD_COMMAND $(MAKE) ${MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
 

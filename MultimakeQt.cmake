@@ -64,7 +64,7 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         INSTALL_COMMAND make install 
         #INSTALL_ROOT=${CMAKE_INSTALL_PREFIX}
         CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
-        BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS}
+        BUILD_COMMAND $(MAKE)
     )
     
     write_variables_file()
@@ -94,7 +94,7 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
             INSTALL_COMMAND make install
             #INSTALL_ROOT=${CMAKE_INSTALL_PREFIX}
             CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
-            BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS}
+            BUILD_COMMAND $(MAKE)
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
         )
         
@@ -128,7 +128,7 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             UPDATE_COMMAND ""
             INSTALL_COMMAND make install
             CONFIGURE_COMMAND <SOURCE_DIR>/${CONFIGURE_CMD}
-            BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS}
+            BUILD_COMMAND $(MAKE)
         )
         
         write_variables_file()
@@ -160,7 +160,7 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             UPDATE_COMMAND ""
             INSTALL_COMMAND make install
             CONFIGURE_COMMAND <SOURCE_DIR>/${CONFIGURE_CMD}
-            BUILD_COMMAND make -j${PARALLEL_BUILD_JOBS}
+            BUILD_COMMAND $(MAKE)
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
         )
 

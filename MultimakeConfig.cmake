@@ -43,14 +43,9 @@ set(AUTOTOOLS_CONFIGURE_COMMAND configure ${CROSS_COMPILER_AUTOTOOLS_OPTIONS} --
 
 set(PROJECTS_DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/Downloads)
 
-OPTION( PARALLEL_BUILD_JOBS "Number of parallel jobs to compile a package" "8" )
-
 OPTION( WITH_ICECC "Enable distributed build with IceCC" OFF)
 IF(WITH_ICECC)
     set(EXTRA_PATH ":/usr/lib/icecc/bin")
-    SET(PARALLEL_BUILD_JOBS 48)
-ELSE()
-    SET(PARALLEL_BUILD_JOBS 8)
 ENDIF()
 
 
