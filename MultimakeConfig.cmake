@@ -203,7 +203,6 @@ validate_git_commit(${PROJECT})
 endmacro()
 
 
-
 macro(set_external_git_project_commit PROJECT COMMIT)
 
     if (NOT DEFINED ${PROJECT}_GIT_COMMIT)
@@ -212,6 +211,17 @@ macro(set_external_git_project_commit PROJECT COMMIT)
         message("Commit or branch already set for component ${PROJECT} : ${${PROJECT}_GIT_COMMIT}")
     endif()
 
+endmacro()
+
+
+macro(get_build_always_property VARIABLE PROJECT)
+    if(${${PROJECT}_BUILD_ALWAYS})
+        if (${CMAKE_VERSION} VERSION_GREATER 3.1)
+            set(${VARIABLE} BUILD_ALWAYS 1)
+        else()
+            message(WARNING "BUILD_ALWAYS is supported with CMake > 3.1 only") 
+        endif()
+    endif()
 endmacro()
 
 

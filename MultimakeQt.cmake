@@ -51,14 +51,15 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     locate_qt()
     set_package_defined(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-    
-    set(CONFIGURE_CMD )
+    get_build_always_property(BUILD_ALWAYS ${PROJECT})
     
     set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake PREFIX=${CMAKE_INSTALL_PREFIX} INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${PROJECTS_LOCATION}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
     
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
         SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+        PREFIX ${PROJECT}
+        ${BUILD_ALWAYS}
         DOWNLOAD_COMMAND ""
         UPDATE_COMMAND ""
         INSTALL_COMMAND make install 
@@ -78,6 +79,7 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
     locate_qt()
     
     validate_git_commit(${PROJECT})
+    get_build_always_property(BUILD_ALWAYS ${PROJECT})
     
     if(NOT ${PROJECT}_DEFINED)
     
@@ -89,6 +91,8 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
+            PREFIX ${PROJECT}
+            ${BUILD_ALWAYS}
             GIT_REPOSITORY ${REPOSITORY_URL}
             UPDATE_COMMAND  ""
             INSTALL_COMMAND make install
@@ -109,6 +113,8 @@ endmacro()
 
 macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
     
+    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    
     if(NOT ${PROJECT}_DEFINED)
     
         # We build Qt ourselves => point to that Qt to build other packages
@@ -122,6 +128,8 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
         
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
+            PREFIX ${PROJECT}
+            ${BUILD_ALWAYS}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
             BINARY_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
             URL ${REPOSITORY_URL}
@@ -141,6 +149,7 @@ endmacro()
 macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
+    get_build_always_property(BUILD_ALWAYS ${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
 
@@ -157,6 +166,8 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
             GIT_REPOSITORY ${REPOSITORY_URL}
+            PREFIX ${PROJECT}
+            ${BUILD_ALWAYS}
             UPDATE_COMMAND ""
             INSTALL_COMMAND make install
             CONFIGURE_COMMAND <SOURCE_DIR>/${CONFIGURE_CMD}

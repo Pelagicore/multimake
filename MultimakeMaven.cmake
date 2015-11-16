@@ -22,9 +22,13 @@ macro(add_maven_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     set_package_defined(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
     
+    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
         SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+        PREFIX ${PROJECT}
+        ${BUILD_ALWAYS}
         DOWNLOAD_COMMAND ""
         UPDATE_COMMAND ""
         INSTALL_COMMAND ""
@@ -47,7 +51,8 @@ endmacro()
 macro(add_maven_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
     
     validate_git_commit(${PROJECT})
-    
+    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+
     if(NOT ${PROJECT}_DEFINED)
         
         set_package_defined_with_git_repository(${PROJECT})
@@ -60,6 +65,8 @@ macro(add_maven_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${SOURCE_DIR}
             GIT_REPOSITORY ${REPOSITORY_URL}
+            PREFIX ${PROJECT}
+            ${BUILD_ALWAYS}
             #    DOWNLOAD_COMMAND ""
             UPDATE_COMMAND ""
             INSTALL_COMMAND ""
