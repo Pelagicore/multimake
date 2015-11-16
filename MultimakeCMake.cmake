@@ -23,7 +23,7 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     set_package_defined(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
 
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
@@ -31,6 +31,7 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         DOWNLOAD_COMMAND ""
         PREFIX ${PROJECT}
         ${BUILD_ALWAYS}
+        ${INSTALL_COMMAND}
         CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -49,7 +50,7 @@ endmacro()
 macro(add_cmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
     
     validate_git_commit(${PROJECT})
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
     
     if(NOT ${PROJECT}_DEFINED)
 
@@ -74,7 +75,7 @@ macro(add_cmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
             ${QT_CMAKE_OPTIONS}
             #    BUILD_COMMAND PKG_CONFIG_PATH=${PKG_CONFIG_PATH} make
             CONFIGURE_COMMAND cmake ${CONFIGURATION_OPTIONS_ALL} ${PROJECTS_DOWNLOAD_DIR}/${PATH}
-            #    INSTALL_COMMAND ""
+            ${INSTALL_COMMAND}
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
         )
 

@@ -17,13 +17,17 @@
 #
 # For further information see LICENSE
 
+# Some broken packages assume that they are going to find some required headers in standard locations such as "/usr/include" instead of using pkg-config to locate those
+# headers. As a workaround, we add the "${CMAKE_INSTALL_PREFIX}/include" folder as an include folder.
+set(AUTOTOOLS_DEFAULT_MAKE_OPTIONS "${AUTOTOOLS_DEFAULT_MAKE_OPTIONS};CFLAGS=-I${CMAKE_INSTALL_PREFIX}/include")
+
 macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS)
 
     set_package_defined(${PROJECT})
     set(CONFIGURE_COMMAND ${PROJECTS_LOCATION}/${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
 
     if (NOT ${PROJECT}_IN_SOURCE_BUILD)
 
@@ -31,10 +35,9 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
             DOWNLOAD_COMMAND ""
-            #      UPDATE_COMMAND
             PREFIX ${PROJECT}
             ${BUILD_ALWAYS}
-            INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+            ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
         )
@@ -48,8 +51,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             PREFIX ${PROJECT}
             ${BUILD_ALWAYS}
             DOWNLOAD_COMMAND ""
-            #      UPDATE_COMMAND
-            INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+            ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
         )
@@ -72,14 +74,14 @@ endmacro()
 macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
     
     if(NOT ${PROJECT}_DEFINED)
     
         set_package_defined_with_git_repository(${PROJECT})
         set(CONFIGURE_COMMAND ${PROJECTS_DOWNLOAD_DIR}/${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-          
+
         if(NOT ${PROJECT}_IN_SOURCE_BUILD)
         
             ExternalProject_Add(${PROJECT}
@@ -88,7 +90,7 @@ macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIE
                 PREFIX ${PROJECT}
                 ${BUILD_ALWAYS}
                 GIT_REPOSITORY ${REPOSITORY_URL}
-                INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+                ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
                 BUILD_COMMAND $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
@@ -103,12 +105,12 @@ macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIE
                 PREFIX ${PROJECT}
                 ${BUILD_ALWAYS}
                 GIT_REPOSITORY ${REPOSITORY_URL}
-                INSTALL_COMMAND make install ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+                ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
                 BUILD_COMMAND $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
-    
+        
         endif()
         
         ExternalProject_Add_Step(${PROJECT} configure_step
@@ -141,7 +143,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
     set_package_defined(${PROJECT})
     set(CONFIGURE_COMMAND ${PROJECTS_LOCATION}/${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
 
     if (NOT ${PROJECT}_IN_SOURCE_BUILD)
         
@@ -151,8 +153,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             PREFIX ${PROJECT}
             ${BUILD_ALWAYS}
             DOWNLOAD_COMMAND ""
-            #      UPDATE_COMMAND
-            INSTALL_COMMAND make install ${MAKE_OPTIONS}
+            ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
         )
@@ -166,8 +167,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             PREFIX ${PROJECT}
             ${BUILD_ALWAYS}
             DOWNLOAD_COMMAND ""
-            #      UPDATE_COMMAND
-            INSTALL_COMMAND make install ${MAKE_OPTIONS}
+            ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
         )
@@ -188,10 +188,10 @@ endmacro()
 
 
 
-macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS  MAKE_OPTIONS)
+macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS MAKE_OPTIONS)
     
     validate_git_commit(${PROJECT})
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
     
@@ -209,7 +209,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_UR
                 PREFIX ${PROJECT}
                 ${BUILD_ALWAYS}
                 GIT_REPOSITORY ${REPOSITORY_URL}
-                INSTALL_COMMAND make install ${MAKE_OPTIONS}
+                ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
                 BUILD_COMMAND $(MAKE) ${MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
@@ -224,7 +224,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_UR
                 PREFIX ${PROJECT}
                 ${BUILD_ALWAYS}
                 GIT_REPOSITORY ${REPOSITORY_URL}
-                INSTALL_COMMAND make install ${MAKE_OPTIONS}
+                ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
                 BUILD_COMMAND $(MAKE) ${MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}

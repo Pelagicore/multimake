@@ -22,7 +22,7 @@ macro(add_maven_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     set_package_defined(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
     
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
     
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
@@ -51,7 +51,7 @@ endmacro()
 macro(add_maven_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
     
     validate_git_commit(${PROJECT})
-    get_build_always_property(BUILD_ALWAYS ${PROJECT})
+    read_common_properties(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
         

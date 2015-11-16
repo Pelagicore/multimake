@@ -5,7 +5,7 @@ Introduction
 ------------
 
 This documentation describes the Multimake package.
-The purpose of this software is to help you build multiple software packages for your system. The tool handles package dependencies in such a way that every package is built only as soon as all the required dependencies have been built.
+The purpose of this software is to help you build multiple software packages at once for your system. The tool handles package dependencies in such a way that every package is built only as soon as all the required dependencies have been built.
 
 Features
 --------
@@ -31,7 +31,7 @@ Examples can be found in the [examples](examples/README.md) folder
 
 
 Known limitations
------------
+-----------------
 
 - Dependee packages must be defined before dependers.
 
@@ -93,3 +93,19 @@ $ sh make PackageToRebuild_deps
    ```
    Note that the default value is "ON", which means packages are built in debug mode by default. 
    
+   
+ - Q : What if there is a package which I do not want to be installed (no "make install")
+ 
+   A : You can set the "*_NO_INSTALL" variable to 1 before adding your package. Example:
+```
+set(MyPackage_NO_INSTALL 1)
+add_cmake_external_project(MyPackage MyPackageLocation "Package2;...." "-DMyConfigurationOption=blabla;...")
+```
+
+ - Q : How do I mark a package to always be rebuilt ("make" called even if it has already successfully been built) 
+ 
+   A : You can set the "*_BUILD_ALWAYS" variable to 1 before adding your package. Example:
+```
+set(MyPackage_BUILD_ALWAYS 1)
+add_cmake_external_project(MyPackage MyPackageLocation "Package2;...." "-DMyConfigurationOption=blabla;...")
+```
