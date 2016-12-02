@@ -34,7 +34,7 @@ macro(locate_qt)
             message("Qt installation located in ${QT_PATH} ${RES}")
             
             set(QT_CMAKE_PATH ${QT_PATH}/lib/cmake)
-            set(QT_CMAKE_OPTIONS -DQt5Core_DIR=${QT_CMAKE_PATH}/Qt5Core -DQt5Widgets_DIR=${QT_CMAKE_PATH}/Qt5Widgets -DQt5Qml_DIR=${QT_CMAKE_PATH}/Qt5Qml -DQt5Gui_DIR=${QT_CMAKE_PATH}/Qt5Gui -DQt5Qml_DIR=${QT_CMAKE_PATH}/Qt5Qml -DQt5Quick_DIR=${QT_CMAKE_PATH}/Qt5Quick -DQt5DBus_DIR=${QT_CMAKE_PATH}/Qt5DBus -DQt5Script_DIR=${QT_CMAKE_PATH}/Qt5Script)
+            set(QT_CMAKE_OPTIONS -DCMAKE_PREFIX_PATH=${QT_CMAKE_PATH})
             
         else()
             message( FATAL_ERROR "A \"qmake\" executable could not be found in your $PATH => Unable to build Qt-based packages !") 
