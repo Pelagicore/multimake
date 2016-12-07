@@ -124,7 +124,7 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-        set(CONFIGURE_CMD configure -prefix ${CMAKE_INSTALL_PREFIX} -debug -opensource -nomake examples -confirm-license ${CONFIGURATION_OPTIONS} )
+        set(CONFIGURE_CMD configure -debug -opensource -nomake examples -confirm-license ${CONFIGURATION_OPTIONS} )
         
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
@@ -160,7 +160,7 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-        set(CONFIGURE_CMD configure -prefix ${CMAKE_INSTALL_PREFIX} -debug -opensource -nomake examples -confirm-license ${CONFIGURATION_OPTIONS} )
+        set(CONFIGURE_CMD configure -debug -opensource -nomake examples -confirm-license ${CONFIGURATION_OPTIONS} )
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
