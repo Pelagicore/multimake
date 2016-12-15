@@ -110,6 +110,11 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
 endmacro()
 
 
+set(QT_STANDARD_CONFIGURE_PROPERTIES "-opensource;-confirm-license")
+
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(QT_STANDARD_CONFIGURE_PROPERTIES "${QT_STANDARD_CONFIGURE_PROPERTIES}")
+endif()
 
 macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
     
@@ -124,8 +129,8 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-        set(CONFIGURE_CMD configure -debug -opensource -nomake examples -confirm-license ${CONFIGURATION_OPTIONS} )
-        
+        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};${CONFIGURATION_OPTIONS}" )
+
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             PREFIX ${PROJECT}
@@ -160,7 +165,7 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-        set(CONFIGURE_CMD configure -debug -opensource -nomake examples -confirm-license ${CONFIGURATION_OPTIONS} )
+        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};${CONFIGURATION_OPTIONS}" )
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
