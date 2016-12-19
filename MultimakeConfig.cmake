@@ -69,6 +69,7 @@ if(NOT DEFINED PROJECTS_LOCATION)
     set(PROJECTS_LOCATION ${CMAKE_SOURCE_DIR})
 endif()
 
+option(ALWAYS_BUILD "Always build or install the projects by default, even if they have been sucessfully installed already" ON)
 
 macro(on_package_already_defined PACKAGE)
     message("Package already defined : ${PACKAGE}")
@@ -212,11 +213,13 @@ endmacro()
 
 macro(read_common_properties PROJECT)
 
-    if(${${PROJECT}_BUILD_ALWAYS})
-        if (${CMAKE_VERSION} VERSION_GREATER 3.1)
-            set(BUILD_ALWAYS BUILD_ALWAYS 1)
-        else()
-            message(WARNING "BUILD_ALWAYS is supported with CMake > 3.1 only") 
+    if(DEFINED ${PROJECT}_BUILD_ALWAYS)
+        if(NOT "${${PROJECT}_BUILD_ALWAYS}" STREQUAL "0")
+            set(${PROJECT}_BUILD_ALWAYS_OPTION BUILD_ALWAYS 1)
+        endif()
+    else()
+        if(ALWAYS_BUILD)
+            set(${PROJECT}_BUILD_ALWAYS_OPTION BUILD_ALWAYS 1)
         endif()
     endif()
 
@@ -227,6 +230,8 @@ macro(read_common_properties PROJECT)
         set(INSTALL_COMMAND )
     endif()
     
+    message("${PROJECT}_BUILD_ALWAYS_OPTION : ${${PROJECT}_BUILD_ALWAYS_OPTION}")
+
 endmacro()
 
 

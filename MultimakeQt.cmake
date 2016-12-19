@@ -59,7 +59,7 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         DEPENDS ${DEPENDENCIES}
         SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
         PREFIX ${PROJECT}
-        ${BUILD_ALWAYS}
+        ${${PROJECT}_BUILD_ALWAYS_OPTION}
         DOWNLOAD_COMMAND ""
         UPDATE_COMMAND ""
         ${INSTALL_COMMAND}
@@ -92,7 +92,7 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             GIT_REPOSITORY ${REPOSITORY_URL}
             UPDATE_COMMAND  ""
             ${INSTALL_COMMAND}
@@ -134,7 +134,7 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
             BINARY_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
             URL ${REPOSITORY_URL}
@@ -172,7 +172,7 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
             GIT_REPOSITORY ${REPOSITORY_URL}
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             UPDATE_COMMAND ""
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND <SOURCE_DIR>/${CONFIGURE_CMD}

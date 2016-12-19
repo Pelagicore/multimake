@@ -28,7 +28,7 @@ macro(add_maven_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         DEPENDS ${DEPENDENCIES}
         SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
         PREFIX ${PROJECT}
-        ${BUILD_ALWAYS}
+        ${${PROJECT}_BUILD_ALWAYS_OPTION}
         DOWNLOAD_COMMAND ""
         UPDATE_COMMAND ""
         INSTALL_COMMAND ""
@@ -66,7 +66,7 @@ macro(add_maven_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
             SOURCE_DIR ${SOURCE_DIR}
             GIT_REPOSITORY ${REPOSITORY_URL}
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             #    DOWNLOAD_COMMAND ""
             UPDATE_COMMAND ""
             INSTALL_COMMAND ""

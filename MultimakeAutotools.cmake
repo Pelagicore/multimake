@@ -36,7 +36,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
             DOWNLOAD_COMMAND ""
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
@@ -49,7 +49,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
             BINARY_DIR ${PROJECTS_LOCATION}/${PATH}
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             DOWNLOAD_COMMAND ""
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
@@ -88,7 +88,7 @@ macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIE
                 DEPENDS ${DEPENDENCIES}
                 SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
                 PREFIX ${PROJECT}
-                ${BUILD_ALWAYS}
+                ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
@@ -103,7 +103,7 @@ macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIE
                 SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
                 BINARY_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
                 PREFIX ${PROJECT}
-                ${BUILD_ALWAYS}
+                ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
@@ -151,7 +151,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             DOWNLOAD_COMMAND ""
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
@@ -165,7 +165,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
             BINARY_DIR ${PROJECTS_LOCATION}/${PATH}
             PREFIX ${PROJECT}
-            ${BUILD_ALWAYS}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
             DOWNLOAD_COMMAND ""
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
@@ -207,7 +207,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_UR
                 DEPENDS ${DEPENDENCIES}
                 SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
                 PREFIX ${PROJECT}
-                ${BUILD_ALWAYS}
+                ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
@@ -222,7 +222,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_UR
                 SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
                 BINARY_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
                 PREFIX ${PROJECT}
-                ${BUILD_ALWAYS}
+                ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
