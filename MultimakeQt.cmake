@@ -53,7 +53,7 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
     read_common_properties(${PROJECT})
     
-    set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake PREFIX=${CMAKE_INSTALL_PREFIX} INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${PROJECTS_LOCATION}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
+    set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake PREFIX=${${PROJECT}_INSTALL_PREFIX} INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX} ${PROJECTS_LOCATION}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
     
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
@@ -86,7 +86,7 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
         set_package_defined_with_git_repository(${PROJECT})
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
         
-        set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake PREFIX=${CMAKE_INSTALL_PREFIX} INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${PROJECTS_DOWNLOAD_DIR}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
+        set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake PREFIX=${${PROJECT}_INSTALL_PREFIX} INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX} ${PROJECTS_DOWNLOAD_DIR}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
         
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
@@ -123,7 +123,7 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
     if(NOT ${PROJECT}_DEFINED)
     
         # We build Qt ourselves => point to that Qt to build other packages
-        set(QT_PATH ${CMAKE_INSTALL_PREFIX})
+        set(QT_PATH ${${PROJECT}_INSTALL_PREFIX})
         
         set_package_defined(${PROJECT})
 
@@ -159,7 +159,7 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
     if(NOT ${PROJECT}_DEFINED)
 
         # We build Qt ourselves => point to that Qt to build other packages
-        set(QT_PATH ${CMAKE_INSTALL_PREFIX})
+        set(QT_PATH ${${PROJECT}_INSTALL_PREFIX})
 
         set_package_defined_with_git_repository(${PROJECT})
 

@@ -20,25 +20,29 @@
 macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS)
 
     append_to_variables(${PROJECT})
-    set_package_defined(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-
     read_common_properties(${PROJECT})
 
-    ExternalProject_Add(${PROJECT}
-        DEPENDS ${DEPENDENCIES}
-        SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
-        DOWNLOAD_COMMAND ""
-        PREFIX ${PROJECT}
-        ${${PROJECT}_BUILD_ALWAYS_OPTION}
-        ${INSTALL_COMMAND}
-        CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        ${CONFIGURATION_OPTIONS}
-        ${COMMON_CMAKE_CONFIGURATION_OPTIONS}
-        ${QT_CMAKE_OPTIONS}
-    )
+    if(NOT ${PROJECT}_DEFINED)
+
+        set_package_defined(${PROJECT})
+        
+        ExternalProject_Add(${PROJECT}
+            DEPENDS ${DEPENDENCIES}
+            SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+            DOWNLOAD_COMMAND ""
+            PREFIX ${PROJECT}
+            ${${PROJECT}_BUILD_ALWAYS_OPTION}
+            ${INSTALL_COMMAND}
+            CMAKE_ARGS
+            -DCMAKE_INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            ${CONFIGURATION_OPTIONS}
+            ${COMMON_CMAKE_CONFIGURATION_OPTIONS}
+            ${QT_CMAKE_OPTIONS}
+        )
+
+    endif()
 
     write_variables_file()
 
@@ -48,10 +52,10 @@ endmacro()
 
 
 macro(add_cmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
-    
+
     validate_git_commit(${PROJECT})
     read_common_properties(${PROJECT})
-    
+
     if(NOT ${PROJECT}_DEFINED)
 
         set_package_defined_with_git_repository(${PROJECT})
@@ -68,7 +72,7 @@ macro(add_cmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
             CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+            -DCMAKE_INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             ${CONFIGURATION_OPTIONS}
             ${COMMON_CMAKE_CONFIGURATION_OPTIONS}

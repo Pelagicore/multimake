@@ -229,7 +229,11 @@ macro(read_common_properties PROJECT)
         # Use standard installation command (should be "make install")
         set(INSTALL_COMMAND )
     endif()
-    
+
+    if (NOT DEFINED ${PROJECT}_INSTALL_PREFIX)
+        set(${PROJECT}_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+    endif()
+
     message("${PROJECT}_BUILD_ALWAYS_OPTION : ${${PROJECT}_BUILD_ALWAYS_OPTION}")
 
 endmacro()
