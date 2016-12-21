@@ -178,21 +178,13 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             CONFIGURE_COMMAND <SOURCE_DIR>/${CONFIGURE_CMD}
             BUILD_COMMAND $(MAKE)
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
-        )
-
-        # Since the Qt configure script does not like that the submodules have already been initialized, we remove them before calling configure
-        ExternalProject_Add_Step(${PROJECT} del_qtactiveqt
-            COMMAND git submodule deinit -f .
-            DEPENDEES update
-            DEPENDERS configure
-            WORKING_DIRECTORY <SOURCE_DIR>
-            ALWAYS 0
+            GIT_SUBMODULES qtbase    # so that only qtbase submodule is cloned here
         )
 
         # Add the initrepository step before "configure" step
         ExternalProject_Add_Step(${PROJECT} init_repository
             COMMAND init-repository -f ${INIT_REPOSITORY_OPTIONS}
-            DEPENDEES del_qtactiveqt
+            DEPENDEES update
             DEPENDERS configure
             WORKING_DIRECTORY <SOURCE_DIR>
             ALWAYS 0
