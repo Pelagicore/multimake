@@ -29,7 +29,7 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
-            SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+            SOURCE_DIR ${PATH}
             DOWNLOAD_COMMAND ""
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}

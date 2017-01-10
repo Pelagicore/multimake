@@ -24,7 +24,7 @@ set(AUTOTOOLS_DEFAULT_MAKE_OPTIONS "${AUTOTOOLS_DEFAULT_MAKE_OPTIONS};CFLAGS=-I$
 macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS)
 
     set_package_defined(${PROJECT})
-    set(CONFIGURE_COMMAND ${PROJECTS_LOCATION}/${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
+    set(CONFIGURE_COMMAND ${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
     read_common_properties(${PROJECT})
@@ -33,7 +33,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
-            SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+            SOURCE_DIR ${PATH}
             DOWNLOAD_COMMAND ""
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
@@ -46,8 +46,8 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
-            SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
-            BINARY_DIR ${PROJECTS_LOCATION}/${PATH}
+            SOURCE_DIR ${PATH}
+            BINARY_DIR ${PATH}
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
             DOWNLOAD_COMMAND ""
@@ -145,7 +145,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
     if(NOT ${PROJECT}_DEFINED)
     
         set_package_defined(${PROJECT})
-        set(CONFIGURE_COMMAND ${PROJECTS_LOCATION}/${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
+        set(CONFIGURE_COMMAND ${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
         read_common_properties(${PROJECT})
     
@@ -153,7 +153,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             
             ExternalProject_Add(${PROJECT}
                 DEPENDS ${DEPENDENCIES}
-                SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+                SOURCE_DIR ${PATH}
                 PREFIX ${PROJECT}
                 ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 DOWNLOAD_COMMAND ""
@@ -166,8 +166,8 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
         
             ExternalProject_Add(${PROJECT}
                 DEPENDS ${DEPENDENCIES}
-                SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
-                BINARY_DIR ${PROJECTS_LOCATION}/${PATH}
+                SOURCE_DIR ${PATH}
+                BINARY_DIR ${PATH}
                 PREFIX ${PROJECT}
                 ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 DOWNLOAD_COMMAND ""

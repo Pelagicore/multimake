@@ -65,10 +65,6 @@ ENDIF()
 
 OPTION( ENABLE_UNINSTALLED_PKG_CONFIG "Enable the use of the uninstalled pkg-config file variants" OFF )
 
-if(NOT DEFINED PROJECTS_LOCATION)
-    set(PROJECTS_LOCATION ${CMAKE_SOURCE_DIR})
-endif()
-
 option(ALWAYS_BUILD "Always build or install the projects by default, even if they have been sucessfully installed already" ON)
 
 macro(on_package_already_defined PACKAGE)

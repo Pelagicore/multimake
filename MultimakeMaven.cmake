@@ -26,7 +26,7 @@ macro(add_maven_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
-        SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+        SOURCE_DIR ${PATH}
         PREFIX ${PROJECT}
         ${${PROJECT}_BUILD_ALWAYS_OPTION}
         DOWNLOAD_COMMAND ""
