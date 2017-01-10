@@ -83,6 +83,7 @@ macro(add_maven_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
         )
           
         write_variables_file()
+        init_repository(${PROJECT})
         
     endif()
     

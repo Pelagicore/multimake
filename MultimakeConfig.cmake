@@ -90,6 +90,21 @@ macro(set_package_defined_with_git_repository PROJECT)
     set_package_defined(${PROJECT})
 endmacro()
 
+function(init_repository PROJECT)
+
+    if(NOT DEFINED ${PROJECT}_init_repository_step_defined)
+        # Add an empty init_repository step which "patch" steps can depend on
+        ExternalProject_Add_Step(${PROJECT} init_repository
+            DEPENDEES update
+            DEPENDERS configure
+        )
+        message("Created step init_repository for ${PROJECT}")  
+    endif()
+
+    set(${PROJECT}_init_repository_step_defined 1)
+
+endfunction()
+
 
 macro(add_available_package PROJECT)
     set_package_defined(${PROJECT})
@@ -173,7 +188,7 @@ endmacro()
 # This macro can be used to simply clone a repository and add operations manually via "ExternalProject_Add_Step"
 macro(add_no_build_external_project PROJECT REPOSITORY_URL DEPENDENCIES)
 
-validate_git_commit(${PROJECT})
+    validate_git_commit(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
 
@@ -235,6 +250,27 @@ macro(read_common_properties PROJECT)
     endif()
 
     message("${PROJECT}_BUILD_ALWAYS_OPTION : ${${PROJECT}_BUILD_ALWAYS_OPTION}")
+
+endmacro()
+
+set(PATCH_INDEX 0)
+
+macro(add_patch PROJECT SUB_FOLDER _COMMAND)
+
+    if(NOT DEFINED ${PROJECT}_init_repository_step_defined)
+        message( FATAL_ERROR "Can't patch project ${PROJECT} since it is not a remote project")
+    endif()
+
+    ExternalProject_Add_step(${PROJECT}
+        ${PATCH_INDEX}_${PROJECT}
+        DEPENDEES init_repository
+        DEPENDERS configure
+        WORKING_DIRECTORY ${PROJECTS_DOWNLOAD_DIR}/${PROJECT}/${SUB_FOLDER}
+        COMMAND echo Patching ${PROJECT}
+        COMMAND ${_COMMAND}
+    )
+
+    set(PATCH_INDEX "${PATCH_INDEX}_")
 
 endmacro()
 

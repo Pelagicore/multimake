@@ -133,6 +133,8 @@ macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIE
         )
         
         write_variables_file()
+
+        init_repository(${PROJECT})
         
     endif()
 
@@ -140,49 +142,53 @@ endmacro()
 
 macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS MAKE_OPTIONS)
     
-    set_package_defined(${PROJECT})
-    set(CONFIGURE_COMMAND ${PROJECTS_LOCATION}/${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
-    add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-    read_common_properties(${PROJECT})
-
-    if (NOT ${PROJECT}_IN_SOURCE_BUILD)
-        
-        ExternalProject_Add(${PROJECT}
-            DEPENDS ${DEPENDENCIES}
-            SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
-            PREFIX ${PROJECT}
-            ${${PROJECT}_BUILD_ALWAYS_OPTION}
-            DOWNLOAD_COMMAND ""
-            ${INSTALL_COMMAND}
-            CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
-        )
-        
-    else()
+    if(NOT ${PROJECT}_DEFINED)
     
-        ExternalProject_Add(${PROJECT}
-            DEPENDS ${DEPENDENCIES}
-            SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
-            BINARY_DIR ${PROJECTS_LOCATION}/${PATH}
-            PREFIX ${PROJECT}
-            ${${PROJECT}_BUILD_ALWAYS_OPTION}
-            DOWNLOAD_COMMAND ""
-            ${INSTALL_COMMAND}
-            CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
+        set_package_defined(${PROJECT})
+        set(CONFIGURE_COMMAND ${PROJECTS_LOCATION}/${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
+        add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
+        read_common_properties(${PROJECT})
+    
+        if (NOT ${PROJECT}_IN_SOURCE_BUILD)
+            
+            ExternalProject_Add(${PROJECT}
+                DEPENDS ${DEPENDENCIES}
+                SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+                PREFIX ${PROJECT}
+                ${${PROJECT}_BUILD_ALWAYS_OPTION}
+                DOWNLOAD_COMMAND ""
+                ${INSTALL_COMMAND}
+                CONFIGURE_COMMAND ""
+                BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
+            )
+            
+        else()
+        
+            ExternalProject_Add(${PROJECT}
+                DEPENDS ${DEPENDENCIES}
+                SOURCE_DIR ${PROJECTS_LOCATION}/${PATH}
+                BINARY_DIR ${PROJECTS_LOCATION}/${PATH}
+                PREFIX ${PROJECT}
+                ${${PROJECT}_BUILD_ALWAYS_OPTION}
+                DOWNLOAD_COMMAND ""
+                ${INSTALL_COMMAND}
+                CONFIGURE_COMMAND ""
+                BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
+            )
+            
+        endif()
+    
+        ExternalProject_Add_Step(${PROJECT} autoreconf_step
+            COMMAND autoreconf -i
+            DEPENDEES configure
+            DEPENDERS build
+            WORKING_DIRECTORY <SOURCE_DIR>
+            ALWAYS 0
         )
         
+        write_variables_file()
+
     endif()
-
-    ExternalProject_Add_Step(${PROJECT} autoreconf_step
-        COMMAND autoreconf -i
-        DEPENDEES configure
-        DEPENDERS build
-        WORKING_DIRECTORY <SOURCE_DIR>
-        ALWAYS 0
-    )
-    
-    write_variables_file()
 
 endmacro()
 
@@ -251,6 +257,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_UR
         )
         
         write_variables_file()
+        init_repository(${PROJECT})
 
     endif()
 

@@ -77,7 +77,6 @@ endmacro()
 macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     locate_qt()
-    
     validate_git_commit(${PROJECT})
     read_common_properties(${PROJECT})
     
@@ -101,7 +100,9 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
             BUILD_COMMAND $(MAKE)
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
         )
-        
+
+        init_repository(${PROJECT})
+
         write_variables_file()
     else()
         on_package_already_defined(${PROJECT})
@@ -181,7 +182,7 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             GIT_SUBMODULES qtbase    # so that only qtbase submodule is cloned here
         )
 
-        # Add the initrepository step before "configure" step
+        # Add the specific init_repository step before "configure" step
         ExternalProject_Add_Step(${PROJECT} init_repository
             COMMAND init-repository -f ${INIT_REPOSITORY_OPTIONS}
             DEPENDEES update
@@ -189,6 +190,9 @@ macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             WORKING_DIRECTORY <SOURCE_DIR>
             ALWAYS 0
         )
+        
+        set(${PROJECT}_init_repository_step_defined 1)
+        init_repository(${PROJECT})
 
         write_variables_file()
 

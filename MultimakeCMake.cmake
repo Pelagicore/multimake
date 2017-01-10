@@ -84,6 +84,10 @@ macro(add_cmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
 
         write_variables_file()
 
+        init_repository(${PROJECT})
+
+    else()
+        on_package_already_defined(${PROJECT})
     endif()
 
 endmacro()
