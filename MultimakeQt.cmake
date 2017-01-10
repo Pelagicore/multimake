@@ -17,6 +17,15 @@
 #
 # For further information see LICENSE
 
+
+set(QT_STANDARD_CONFIGURE_PROPERTIES "-opensource;-confirm-license")
+
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(QT_STANDARD_CONFIGURE_PROPERTIES "${QT_STANDARD_CONFIGURE_PROPERTIES};-debug")
+    set(QMAKE_COMMON_CONFIGURATION_OPTIONS "CONFIG+=debug")
+endif()
+
+
 macro(locate_qt)
     
     if(NOT DEFINED QT_PATH)
@@ -110,12 +119,6 @@ macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CO
 
 endmacro()
 
-
-set(QT_STANDARD_CONFIGURE_PROPERTIES "-opensource;-confirm-license")
-
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(QT_STANDARD_CONFIGURE_PROPERTIES "${QT_STANDARD_CONFIGURE_PROPERTIES}")
-endif()
 
 macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
     

@@ -39,31 +39,27 @@ set(AUTOTOOLS_CONFIGURE_COMMAND configure ${CROSS_COMPILER_AUTOTOOLS_OPTIONS} --
 
 set(PROJECTS_DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/Downloads)
 
-OPTION( WITH_ICECC "Enable distributed build with IceCC" OFF)
-IF(WITH_ICECC)
+option( WITH_ICECC "Enable distributed build with IceCC" OFF)
+if(WITH_ICECC)
     set(EXTRA_PATH ":/usr/lib/icecc/bin")
-ENDIF()
+endif()
 
 
-OPTION( ENABLE_DEBUG "Enable debug mode" ON )
-IF(ENABLE_DEBUG)
-    set(CMAKE_BUILD_TYPE Debug)
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     set(AUTOTOOLS_CONFIGURE_COMMAND ${AUTOTOOLS_CONFIGURE_COMMAND} "CXXFLAGS=-O0 -g")
-ELSE()
-    set(CMAKE_BUILD_TYPE RelWithDebInfo)
+else()
     set(AUTOTOOLS_CONFIGURE_COMMAND ${AUTOTOOLS_CONFIGURE_COMMAND} "CXXFLAGS=-O2 -g")
-ENDIF()
+endif()
 
-
-OPTION( WITH_CLANG "Use Clang compiler" OFF )
-IF(WITH_CLANG)
+option( WITH_CLANG "Use Clang compiler" OFF )
+if(WITH_CLANG)
     set(CMAKE_C_COMPILER clang)
     set(CMAKE_CXX_COMPILER clang++)
     set(COMMON_CMAKE_CONFIGURATION_OPTIONS ${COMMON_CMAKE_CONFIGURATION_OPTIONS} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++)
-ENDIF()
+endif()
 
 
-OPTION( ENABLE_UNINSTALLED_PKG_CONFIG "Enable the use of the uninstalled pkg-config file variants" OFF )
+option( ENABLE_UNINSTALLED_PKG_CONFIG "Enable the use of the uninstalled pkg-config file variants" OFF )
 
 option(ALWAYS_BUILD "Always build or install the projects by default, even if they have been sucessfully installed already" ON)
 
