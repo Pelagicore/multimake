@@ -55,6 +55,27 @@ set_external_git_project_commit(packageName branch-or-tag-or-commitID)
 ```
 
 
+Reference
+---------
+
+Some variables can be set before adding a package, in order to override the default behavior. 
+
+| Variable name              |      Description              | Default behavior/value                          |
+|----------------------------|:-----------------------------:|---------------------------------------:|
+| PackageName_INSTALL_PREFIX | package installation prefix   | ${CMAKE_INSTALL_PREFIX}, which defaults to "/usr/local" |
+| PackageName_NO_INSTALL | If set to "1", disables the installation ("make install") | "make install" is called every time the build is triggered |
+| PackageName_BUILD_ALWAYS | When set to "0", the package will not be rebuilt if it has been successfully built once | "make" is called every time the build is triggered |
+| PackageName_GIT_COMMIT | specifies the GIT commit or branch to be checked out | "master" |
+
+### Example
+
+```
+    set(gammaray_GIT_COMMIT v2.6.0)
+    add_cmake_external_git_project(gammaray "git://github.com/KDAB/GammaRay.git" "qt" "" "")
+```
+
+
+
 TODO
 ----
 

@@ -83,7 +83,7 @@ endmacro()
 
 
 
-macro(add_qmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
+macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     locate_qt()
     validate_git_commit(${PROJECT})
@@ -155,7 +155,7 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
 endmacro()
 
 
-macro(add_qt_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
+macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
     read_common_properties(${PROJECT})

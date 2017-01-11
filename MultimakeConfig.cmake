@@ -243,6 +243,8 @@ macro(read_common_properties PROJECT)
 
     message("${PROJECT}_BUILD_ALWAYS_OPTION : ${${PROJECT}_BUILD_ALWAYS_OPTION}")
 
+    set(PATH ${PROJECT})
+
 endmacro()
 
 set(PATCH_INDEX 0)

@@ -51,7 +51,7 @@ endmacro()
 
 
 
-macro(add_cmake_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
+macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
     read_common_properties(${PROJECT})

@@ -71,7 +71,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
 endmacro()
 
 
-macro(add_autotools_external_git_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
+macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
     read_common_properties(${PROJECT})
@@ -194,7 +194,7 @@ endmacro()
 
 
 
-macro(add_autotools_external_git_project_badconfigure PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS MAKE_OPTIONS)
+macro(add_autotools_external_git_project_badconfigure PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS MAKE_OPTIONS)
     
     validate_git_commit(${PROJECT})
     read_common_properties(${PROJECT})

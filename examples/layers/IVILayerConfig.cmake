@@ -19,8 +19,8 @@
 
 find_package(Multimake)
 
-add_cmake_external_git_project(dlt dlt "https://github.com/Pelagicore/dlt.git" "zlib" "" )
+add_cmake_external_git_project(dlt "https://github.com/Pelagicore/dlt.git" "zlib" "" )
 
-add_cmake_external_git_project(ivi-logging ivi-logging "https://github.com/Pelagicore/ivi-logging.git" "dlt" "" )
+add_cmake_external_git_project(ivi-logging "https://github.com/Pelagicore/ivi-logging.git" "dlt" "" )
 
-add_cmake_external_git_project(ivi-main-loop ivi-main-loop  "https://github.com/Pelagicore/MainLoop.git" "" "" )
+add_cmake_external_git_project(ivi-main-loop "https://github.com/Pelagicore/MainLoop.git" "" "" )
