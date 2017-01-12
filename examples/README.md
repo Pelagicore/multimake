@@ -10,7 +10,7 @@ $ cd multimake/examples/BuildIVIPackages
 $ mkdir build
 $ cd build
 $ PATH=$PATH:../../..:../../layers cmake .. -DCMAKE_INSTALL_PREFIX=$PWD/install
-$ sh make ivi-logging
+$ make ivi-logging
 ```
 
 You should now have a directory called "install" in the build directory, where the packages have been installed. You can start the example application with the following command:

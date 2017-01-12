@@ -37,7 +37,7 @@ macro(add_maven_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     )
     
     ExternalProject_Add_Step(${PROJECT} installd
-        COMMAND mvn install ${MAVEN_OPTIONS}
+        COMMAND ${SET_ENV} mvn install ${MAVEN_OPTIONS}
         DEPENDEES configure
         WORKING_DIRECTORY <SOURCE_DIR>
         ALWAYS 0
@@ -76,7 +76,7 @@ macro(add_maven_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
         )
         
         ExternalProject_Add_Step(${PROJECT} installd
-            COMMAND mvn install ${MAVEN_OPTIONS}
+            COMMAND ${SET_ENV} mvn install ${MAVEN_OPTIONS}
             DEPENDEES configure
             WORKING_DIRECTORY ${SOURCE_DIR}/${PATH}
             ALWAYS 0

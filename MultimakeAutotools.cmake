@@ -39,7 +39,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+            BUILD_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND} && ${SET_ENV} $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
         )
 
     else()
@@ -53,13 +53,13 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
             DOWNLOAD_COMMAND ""
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ""
-            BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+            BUILD_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND} && ${SET_ENV} $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
         )
 
     endif()
 
     ExternalProject_Add_Step(${PROJECT} autoreconf_step
-        COMMAND autoreconf -i
+        COMMAND ${SET_ENV} autoreconf -i
         DEPENDEES configure
         DEPENDERS build
         WORKING_DIRECTORY <SOURCE_DIR>
@@ -92,7 +92,7 @@ macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CON
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+                BUILD_COMMAND ${SET_ENV} $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
             
@@ -107,7 +107,7 @@ macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CON
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
+                BUILD_COMMAND ${SET_ENV} $(MAKE) ${AUTOTOOLS_DEFAULT_MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
         
@@ -159,7 +159,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
                 DOWNLOAD_COMMAND ""
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
+                BUILD_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
             )
             
         else()
@@ -173,7 +173,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
                 DOWNLOAD_COMMAND ""
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
+                BUILD_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND} && $(MAKE) ${MAKE_OPTIONS}
             )
             
         endif()
@@ -217,7 +217,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT REPOSITORY_URL DEP
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND $(MAKE) ${MAKE_OPTIONS}
+                BUILD_COMMAND ${SET_ENV} $(MAKE) ${MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
         
@@ -232,7 +232,7 @@ macro(add_autotools_external_git_project_badconfigure PROJECT REPOSITORY_URL DEP
                 GIT_REPOSITORY ${REPOSITORY_URL}
                 ${INSTALL_COMMAND}
                 CONFIGURE_COMMAND ""
-                BUILD_COMMAND $(MAKE) ${MAKE_OPTIONS}
+                BUILD_COMMAND ${SET_ENV} $(MAKE) ${MAKE_OPTIONS}
                 GIT_TAG ${${PROJECT}_GIT_COMMIT}
             )
 

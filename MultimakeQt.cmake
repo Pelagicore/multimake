@@ -73,8 +73,8 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         UPDATE_COMMAND ""
         ${INSTALL_COMMAND}
         #INSTALL_ROOT=${CMAKE_INSTALL_PREFIX}
-        CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
-        BUILD_COMMAND $(MAKE)
+        CONFIGURE_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND}
+        BUILD_COMMAND ${SET_ENV} $(MAKE)
     )
     
     write_variables_file()
@@ -105,8 +105,8 @@ macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
             UPDATE_COMMAND  ""
             ${INSTALL_COMMAND}
             #INSTALL_ROOT=${CMAKE_INSTALL_PREFIX}
-            CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
-            BUILD_COMMAND $(MAKE)
+            CONFIGURE_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND}
+            BUILD_COMMAND ${SET_ENV} $(MAKE)
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
         )
 
@@ -144,8 +144,8 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             URL ${REPOSITORY_URL}
             UPDATE_COMMAND ""
             ${INSTALL_COMMAND}
-            CONFIGURE_COMMAND <SOURCE_DIR>/${CONFIGURE_CMD}
-            BUILD_COMMAND $(MAKE)
+            CONFIGURE_COMMAND ${SET_ENV} <SOURCE_DIR>/${CONFIGURE_CMD}
+            BUILD_COMMAND ${SET_ENV} $(MAKE)
         )
         
         write_variables_file()
@@ -179,21 +179,21 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
             UPDATE_COMMAND ""
             ${INSTALL_COMMAND}
-            CONFIGURE_COMMAND <SOURCE_DIR>/${CONFIGURE_CMD}
-            BUILD_COMMAND $(MAKE)
+            CONFIGURE_COMMAND ${SET_ENV} <SOURCE_DIR>/${CONFIGURE_CMD}
+            BUILD_COMMAND ${SET_ENV} $(MAKE)
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
             GIT_SUBMODULES qtbase    # so that only qtbase submodule is cloned here
         )
 
         # Add the specific init_repository step before "configure" step
         ExternalProject_Add_Step(${PROJECT} init_repository
-            COMMAND init-repository -f ${INIT_REPOSITORY_OPTIONS}
+            COMMAND ${SET_ENV} init-repository -f ${INIT_REPOSITORY_OPTIONS}
             DEPENDEES update
             DEPENDERS configure
             WORKING_DIRECTORY <SOURCE_DIR>
             ALWAYS 0
         )
-        
+
         set(${PROJECT}_init_repository_step_defined 1)
         init_repository(${PROJECT})
 

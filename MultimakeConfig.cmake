@@ -128,8 +128,6 @@ endmacro()
 
 
 macro(write_variables_file)
-    file(WRITE ${PROJECT_BINARY_DIR}/make "PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig:$PKG_CONFIG_PATH PATH=${CMAKE_INSTALL_PREFIX}/bin:${EXTRA_PATH}:$PATH LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_FULL_LIBDIR}:$LD_LIBRARY_PATH make $@")
-    # TODO : find a way to make the "make" file executable
 endmacro()
 
 
@@ -244,6 +242,12 @@ macro(read_common_properties PROJECT)
     message("${PROJECT}_BUILD_ALWAYS_OPTION : ${${PROJECT}_BUILD_ALWAYS_OPTION}")
 
     set(PATH ${PROJECT})
+
+    set(SET_ENV
+        "PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig:$ENV{PKG_CONFIG_PATH}"
+        "PATH=${CMAKE_INSTALL_PREFIX}/bin:${EXTRA_PATH}:$ENV{PATH}"
+        "LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_FULL_LIBDIR}:$ENV{LD_LIBRARY_PATH}"
+    )
 
 endmacro()
 
