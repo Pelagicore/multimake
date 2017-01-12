@@ -253,7 +253,9 @@ endmacro()
 
 set(PATCH_INDEX 0)
 
-macro(add_patch PROJECT SUB_FOLDER _COMMAND)
+macro(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
+
+    separate_arguments(_COMMAND UNIX_COMMAND ${COMMAND_STRING})
 
     if(NOT DEFINED ${PROJECT}_init_repository_step_defined)
         message( FATAL_ERROR "Can't patch project ${PROJECT} since it is not a remote project")
