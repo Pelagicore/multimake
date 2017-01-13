@@ -39,11 +39,21 @@ set(AUTOTOOLS_CONFIGURE_COMMAND configure ${CROSS_COMPILER_AUTOTOOLS_OPTIONS} --
 
 set(PROJECTS_DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/Downloads)
 
-option( WITH_ICECC "Enable distributed build with IceCC" OFF)
-if(WITH_ICECC)
-    set(EXTRA_PATH ":/usr/lib/icecc/bin")
+option(WITH_CCACHE "Enable use of ccache" OFF)
+if(WITH_CCACHE)
+    set(EXTRA_PATH ":/usr/lib/ccache")
+    message("ccache enabled")
 endif()
 
+option(WITH_ICECC "Enable distributed build with IceCC" OFF)
+if(WITH_ICECC)
+    message("icecc enabled")
+    if(WITH_CCACHE)
+        set(CCACHE_ENV "CCACHE_PREFIX=icecc")
+    else()
+        set(EXTRA_PATH ":/usr/lib/icecc/bin")
+    endif()
+endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     set(AUTOTOOLS_CONFIGURE_COMMAND ${AUTOTOOLS_CONFIGURE_COMMAND} "CXXFLAGS=-O0 -g")
@@ -90,7 +100,6 @@ function(init_repository PROJECT)
             DEPENDEES update
             DEPENDERS configure
         )
-        message("Created step init_repository for ${PROJECT}")  
     endif()
 
     set(${PROJECT}_init_repository_step_defined 1)
@@ -239,14 +248,13 @@ macro(read_common_properties PROJECT)
         set(${PROJECT}_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
     endif()
 
-    message("${PROJECT}_BUILD_ALWAYS_OPTION : ${${PROJECT}_BUILD_ALWAYS_OPTION}")
-
     set(PATH ${PROJECT})
 
     set(SET_ENV
         "PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig:$ENV{PKG_CONFIG_PATH}"
         "PATH=${CMAKE_INSTALL_PREFIX}/bin:${EXTRA_PATH}:$ENV{PATH}"
         "LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_FULL_LIBDIR}:$ENV{LD_LIBRARY_PATH}"
+        "${CCACHE_ENV}"
     )
 
 endmacro()
