@@ -48,6 +48,8 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
 
     endif()
 
+    add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
+
     write_variables_file()
 
 endmacro()
@@ -90,6 +92,8 @@ macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
         write_variables_file()
 
         init_repository(${PROJECT})
+
+        add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
 
     else()
         on_package_already_defined(${PROJECT})

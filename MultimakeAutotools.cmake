@@ -66,6 +66,8 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
         ALWAYS 0
     )
 
+    add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
+
     write_variables_file()
 
 endmacro()
@@ -120,7 +122,7 @@ macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CON
             WORKING_DIRECTORY <BINARY_DIR>
             ALWAYS 0
         )
-        
+
         # We create a link to "install-sh" since that is way to get common-api packages built properly under Debian.
         # TODO : get common-api packages fixed and remove that hack 
         ExternalProject_Add_Step(${PROJECT} autoreconf_step
@@ -131,7 +133,9 @@ macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CON
             WORKING_DIRECTORY <SOURCE_DIR>
             ALWAYS 0
         )
-        
+
+        add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
+
         write_variables_file()
 
         init_repository(${PROJECT})

@@ -60,6 +60,9 @@ if(WITH_ICECC)
     endif()
 endif()
 
+option(ENABLE_DEDICATED_INSTALLATION "Enable installation of every package in its own installation folder" OFF)
+
+
 if(WITH_ICECC)
     message("icecc enabled")
     if(WITH_CCACHE)
@@ -264,6 +267,8 @@ macro(read_common_properties PROJECT)
 
     set(PATH ${PROJECT})
 
+    set(DEPLOYMENT_PATH "${CMAKE_BINARY_DIR}/${PROJECT}/deploy")
+
     set(SET_ENV
         "PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig:$ENV{PKG_CONFIG_PATH}"
         "PATH=${CMAKE_INSTALL_PREFIX}/bin:${EXTRA_PATH}:$ENV{PATH}"
@@ -293,6 +298,20 @@ macro(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
     )
 
     set(PATCH_INDEX "${PATCH_INDEX}_")
+
+endmacro()
+
+
+macro(add_deployment_steps PROJECT INSTALL_COMMAND_PARAMETERS)
+
+    if(ENABLE_DEDICATED_INSTALLATION)
+        ExternalProject_Add_Step(${PROJECT} deploy
+            DEPENDEES install
+            COMMAND echo Deploying project ${PROJECT}
+            COMMAND $(MAKE) install ${INSTALL_COMMAND_PARAMETERS}
+            WORKING_DIRECTORY <BINARY_DIR>
+        )
+    endif()
 
 endmacro()
 
