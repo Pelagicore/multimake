@@ -17,17 +17,35 @@
 #
 # For further information see LICENSE
 
+macro(read_cmake_properties PROJECT)
+
+    read_common_properties(${PROJECT})
+
+    if("${PROJECT}_GENERATOR" STREQUAL "ninja")
+        set(CMAKE_GENERATOR_OPTIONS -G Ninja)
+        message("Using Ninja generator for ${PROJECT}")
+        set(MAKE_COMMAND ninja -j20)
+        if(NOT DEFINED INSTALL_COMMAND)
+            set(INSTALL_COMMAND ${MAKE_COMMAND} install)
+        endif()
+    else()
+        set(MAKE_COMMAND "$(MAKE)")
+    endif()
+
+endmacro()
+
+
 macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS)
 
     append_to_variables(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-    read_common_properties(${PROJECT})
+    read_cmake_properties(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
 
         set_package_defined(${PROJECT})
 
-        set(CONFIGURATION_OPTIONS_ALL -DCMAKE_INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CONFIGURATION_OPTIONS} ${COMMON_CMAKE_CONFIGURATION_OPTIONS} ${QT_CMAKE_OPTIONS})
+        set(CONFIGURATION_OPTIONS_ALL ${CMAKE_GENERATOR_OPTIONS} -DCMAKE_INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CONFIGURATION_OPTIONS} ${COMMON_CMAKE_CONFIGURATION_OPTIONS} ${QT_CMAKE_OPTIONS})
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
@@ -37,7 +55,7 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
             ${INSTALL_COMMAND}
             CONFIGURE_COMMAND ${SET_ENV} cmake ${CONFIGURATION_OPTIONS_ALL} ${PATH}
-            BUILD_COMMAND ${SET_ENV} $(MAKE)
+            BUILD_COMMAND ${SET_ENV} ${MAKE_COMMAND}
         )
 
     endif()
@@ -54,7 +72,7 @@ endmacro()
 macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
-    read_common_properties(${PROJECT})
+    read_cmake_properties(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
 
@@ -63,7 +81,7 @@ macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
         check_dependencies_existence(${PROJECT} "${DEPENDENCIES}")
         append_to_variables(${PROJECT})
 
-        set(CONFIGURATION_OPTIONS_ALL -DCMAKE_INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CONFIGURATION_OPTIONS} ${COMMON_CMAKE_CONFIGURATION_OPTIONS} ${QT_CMAKE_OPTIONS}) 
+        set(CONFIGURATION_OPTIONS_ALL ${CMAKE_GENERATOR_OPTIONS} -DCMAKE_INSTALL_PREFIX=${${PROJECT}_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CONFIGURATION_OPTIONS} ${COMMON_CMAKE_CONFIGURATION_OPTIONS} ${QT_CMAKE_OPTIONS}) 
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
@@ -72,7 +90,7 @@ macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
             CONFIGURE_COMMAND ${SET_ENV} cmake ${CONFIGURATION_OPTIONS_ALL} ${PROJECTS_DOWNLOAD_DIR}/${PATH}
-            BUILD_COMMAND ${SET_ENV} $(MAKE)
+            BUILD_COMMAND ${SET_ENV} ${MAKE_COMMAND}
             ${INSTALL_COMMAND}
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
         )

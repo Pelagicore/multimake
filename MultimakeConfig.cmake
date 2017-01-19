@@ -255,7 +255,7 @@ macro(read_common_properties PROJECT)
     endif()
 
     if(${${PROJECT}_NO_INSTALL})
-        set(INSTALL_COMMAND INSTALL_COMMAND echo No installation for ${PROJECT})
+        set(INSTALL_COMMAND INSTALL_COMMAND echo Installation of ${PROJECT} is disabled)
     else()
         # Use standard installation command (should be "make install")
         set(INSTALL_COMMAND )
