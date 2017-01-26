@@ -276,6 +276,8 @@ macro(read_common_properties PROJECT)
         "${CCACHE_ENV}"
     )
 
+    set(DEPLOY_COMMAND $(MAKE) install)
+
 endmacro()
 
 set(PATCH_INDEX 0)
@@ -308,7 +310,7 @@ macro(add_deployment_steps PROJECT INSTALL_COMMAND_PARAMETERS)
         ExternalProject_Add_Step(${PROJECT} deploy
             DEPENDEES install
             COMMAND echo Deploying project ${PROJECT}
-            COMMAND $(MAKE) install ${INSTALL_COMMAND_PARAMETERS}
+            COMMAND ${DEPLOY_COMMAND} ${INSTALL_COMMAND_PARAMETERS}
             WORKING_DIRECTORY <BINARY_DIR>
         )
     endif()
