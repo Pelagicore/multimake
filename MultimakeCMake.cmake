@@ -25,12 +25,17 @@ macro(read_cmake_properties PROJECT)
         set(CMAKE_GENERATOR_OPTIONS -G Ninja)
         message("Using Ninja generator for ${PROJECT}")
         set(MAKE_COMMAND ninja -j20)
-        if(NOT DEFINED INSTALL_COMMAND)
+        
+        # INSTALL_COMMAND might already set to be disabled 
+        if(NOT ${${PROJECT}_NO_INSTALL})
             set(INSTALL_COMMAND ${MAKE_COMMAND} install)
-            set(DEPLOY_COMMAND ${INSTALL_COMMAND})
         endif()
+
+        set(DEPLOY_COMMAND DESTDIR=${DEPLOYMENT_PATH} ninja install)
+
     else()
         set(MAKE_COMMAND "$(MAKE)")
+        set(DEPLOY_COMMAND ${MAKE_COMMAND} install DESTDIR=${DEPLOYMENT_PATH})
     endif()
 
 endmacro()
@@ -61,7 +66,7 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
 
     endif()
 
-    add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
+    add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
     write_variables_file()
 
@@ -100,7 +105,7 @@ macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
 
         init_repository(${PROJECT})
 
-        add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
+        add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
     else()
         on_package_already_defined(${PROJECT})

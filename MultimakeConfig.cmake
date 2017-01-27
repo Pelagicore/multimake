@@ -304,15 +304,16 @@ macro(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
 endmacro()
 
 
-macro(add_deployment_steps PROJECT INSTALL_COMMAND_PARAMETERS)
+macro(add_deployment_steps PROJECT DEPLOY_COMMAND)
 
     if(ENABLE_DEDICATED_INSTALLATION)
         ExternalProject_Add_Step(${PROJECT} deploy
             DEPENDEES install
             COMMAND echo Deploying project ${PROJECT}
-            COMMAND ${DEPLOY_COMMAND} ${INSTALL_COMMAND_PARAMETERS}
+            COMMAND ${SET_ENV} ${DEPLOY_COMMAND}
             WORKING_DIRECTORY <BINARY_DIR>
         )
+        message("DEPLOY_COMMAND ${PROJECT}: ${DEPLOY_COMMAND}") 
     endif()
 
 endmacro()

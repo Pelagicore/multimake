@@ -25,6 +25,14 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     set(QMAKE_COMMON_CONFIGURATION_OPTIONS "CONFIG+=debug")
 endif()
 
+macro(read_qmake_properties PROJECT)
+
+    read_common_properties(${PROJECT})
+    set(MAKE_COMMAND "$(MAKE)")
+    set(DEPLOY_COMMAND ${MAKE_COMMAND} install INSTALL_ROOT=${DEPLOYMENT_PATH})
+
+endmacro()
+
 
 macro(locate_qt)
     
@@ -60,7 +68,7 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     locate_qt()
     set_package_defined(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-    read_common_properties(${PROJECT})
+    read_qmake_properties(${PROJECT})
     
     set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake ${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
     
@@ -76,7 +84,7 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         BUILD_COMMAND ${SET_ENV} $(MAKE)
     )
 
-    add_deployment_steps(${PROJECT} "INSTALL_ROOT=${DEPLOYMENT_PATH}")
+    add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
     write_variables_file()
 
@@ -88,7 +96,7 @@ macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
 
     locate_qt()
     validate_git_commit(${PROJECT})
-    read_common_properties(${PROJECT})
+    read_qmake_properties(${PROJECT})
     
     if(NOT ${PROJECT}_DEFINED)
     
@@ -112,7 +120,7 @@ macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
 
         init_repository(${PROJECT})
 
-        add_deployment_steps(${PROJECT} "INSTALL_ROOT=${DEPLOYMENT_PATH}")
+        add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
         write_variables_file()
     else()
@@ -149,6 +157,8 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             CONFIGURE_COMMAND ${SET_ENV} <SOURCE_DIR>/${CONFIGURE_CMD}
             BUILD_COMMAND ${SET_ENV} $(MAKE)
         )
+        
+        add_deployment_steps(${PROJECT} "$(MAKE);INSTALL_ROOT=${DEPLOYMENT_PATH}")
         
         write_variables_file()
     
@@ -199,7 +209,7 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
         set(${PROJECT}_init_repository_step_defined 1)
         init_repository(${PROJECT})
 
-        add_deployment_steps(${PROJECT} "INSTALL_ROOT=${DEPLOYMENT_PATH}")
+        add_deployment_steps(${PROJECT} "$(MAKE);INSTALL_ROOT=${DEPLOYMENT_PATH}")
 
         write_variables_file()
 

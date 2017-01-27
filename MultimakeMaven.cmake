@@ -42,7 +42,7 @@ macro(add_maven_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         WORKING_DIRECTORY <SOURCE_DIR>
         ALWAYS 0
     )
-      
+
     write_variables_file()
 
 endmacro()

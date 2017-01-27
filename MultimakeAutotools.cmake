@@ -21,13 +21,22 @@
 # headers. As a workaround, we add the "${CMAKE_INSTALL_PREFIX}/include" folder as an include folder.
 set(AUTOTOOLS_DEFAULT_MAKE_OPTIONS "${AUTOTOOLS_DEFAULT_MAKE_OPTIONS};CFLAGS=-I${CMAKE_INSTALL_PREFIX}/include")
 
+macro(read_autotools_properties PROJECT)
+
+    read_common_properties(${PROJECT})
+    set(MAKE_COMMAND "$(MAKE)")
+    set(DEPLOY_COMMAND ${MAKE_COMMAND} install DESTDIR=${DEPLOYMENT_PATH})
+
+endmacro()
+
+
 macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS)
 
     set_package_defined(${PROJECT})
     set(CONFIGURE_COMMAND ${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-    read_common_properties(${PROJECT})
+    read_autotools_properties(${PROJECT})
 
     if (NOT ${PROJECT}_IN_SOURCE_BUILD)
 
@@ -66,7 +75,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
         ALWAYS 0
     )
 
-    add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
+    add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
     write_variables_file()
 
@@ -76,7 +85,7 @@ endmacro()
 macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
-    read_common_properties(${PROJECT})
+    read_autotools_properties(${PROJECT})
     
     if(NOT ${PROJECT}_DEFINED)
     
@@ -134,7 +143,7 @@ macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CON
             ALWAYS 0
         )
 
-        add_deployment_steps(${PROJECT} "DESTDIR=${DEPLOYMENT_PATH}")
+        add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
         write_variables_file()
 
@@ -151,7 +160,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
         set_package_defined(${PROJECT})
         set(CONFIGURE_COMMAND ${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-        read_common_properties(${PROJECT})
+        read_autotools_properties(${PROJECT})
     
         if (NOT ${PROJECT}_IN_SOURCE_BUILD)
             
@@ -190,6 +199,8 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             ALWAYS 0
         )
         
+        add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
+        
         write_variables_file()
 
     endif()
@@ -201,7 +212,7 @@ endmacro()
 macro(add_autotools_external_git_project_badconfigure PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS MAKE_OPTIONS)
     
     validate_git_commit(${PROJECT})
-    read_common_properties(${PROJECT})
+    read_autotools_properties(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
     
@@ -259,6 +270,8 @@ macro(add_autotools_external_git_project_badconfigure PROJECT REPOSITORY_URL DEP
             WORKING_DIRECTORY <SOURCE_DIR>
             ALWAYS 0
         )
+        
+        add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
         
         write_variables_file()
         init_repository(${PROJECT})
