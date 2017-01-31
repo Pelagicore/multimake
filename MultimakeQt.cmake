@@ -158,7 +158,7 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             BUILD_COMMAND ${SET_ENV} $(MAKE)
         )
         
-        add_deployment_steps(${PROJECT} "$(MAKE);INSTALL_ROOT=${DEPLOYMENT_PATH}")
+        add_deployment_steps(${PROJECT} "$(MAKE);install;INSTALL_ROOT=${DEPLOYMENT_PATH}")
         
         write_variables_file()
     
@@ -209,7 +209,7 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
         set(${PROJECT}_init_repository_step_defined 1)
         init_repository(${PROJECT})
 
-        add_deployment_steps(${PROJECT} "$(MAKE);INSTALL_ROOT=${DEPLOYMENT_PATH}")
+        add_deployment_steps(${PROJECT} "$(MAKE);install;INSTALL_ROOT=${DEPLOYMENT_PATH}")
 
         write_variables_file()
 
