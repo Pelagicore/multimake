@@ -109,7 +109,7 @@ macro(set_package_defined_with_git_repository PROJECT)
     set_package_defined(${PROJECT})
 endmacro()
 
-function(init_repository PROJECT)
+macro(init_repository PROJECT)
 
     if(NOT DEFINED ${PROJECT}_init_repository_step_defined)
         # Add an empty init_repository step which "patch" steps can depend on
@@ -121,7 +121,7 @@ function(init_repository PROJECT)
 
     set(${PROJECT}_init_repository_step_defined 1)
 
-endfunction()
+endmacro()
 
 
 macro(add_available_package PROJECT)
@@ -280,28 +280,38 @@ macro(read_common_properties PROJECT)
 
 endmacro()
 
-set(PATCH_INDEX 0)
 
-macro(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
-
-    separate_arguments(_COMMAND UNIX_COMMAND ${COMMAND_STRING})
+function(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
 
     if(NOT DEFINED ${PROJECT}_init_repository_step_defined)
         message( FATAL_ERROR "Can't patch project ${PROJECT} since it is not a remote project")
     endif()
 
+    get_property(PATCH_COUNT TARGET ${PROJECT} PROPERTY PATCH_COUNT)
+
+    if("${PATCH_COUNT}" STREQUAL "")
+        set(PATCH_COUNT 0)
+    else()
+        set(ADDITIONAL_DEPENDEES patch_${PATCH_COUNT})
+        math(EXPR PATCH_COUNT "${PATCH_COUNT}+1")
+    endif()
+
+    separate_arguments(_COMMAND UNIX_COMMAND ${COMMAND_STRING})
+
     ExternalProject_Add_step(${PROJECT}
-        ${PATCH_INDEX}_${PROJECT}
+        patch_${PATCH_COUNT}
         DEPENDEES init_repository
+        DEPENDEES ${ADDITIONAL_DEPENDEES}
         DEPENDERS configure
         WORKING_DIRECTORY ${PROJECTS_DOWNLOAD_DIR}/${PROJECT}/${SUB_FOLDER}
         COMMAND echo Patching ${PROJECT}
         COMMAND ${_COMMAND}
+        ALWAYS 0
     )
 
-    set(PATCH_INDEX "${PATCH_INDEX}_")
+    set_property(TARGET ${PROJECT} PROPERTY PATCH_COUNT ${PATCH_COUNT})
 
-endmacro()
+endfunction()
 
 
 macro(add_deployment_steps PROJECT DEPLOY_COMMAND)
