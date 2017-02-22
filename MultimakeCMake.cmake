@@ -25,7 +25,7 @@ macro(read_cmake_properties PROJECT)
         set(CMAKE_GENERATOR_OPTIONS -G Ninja)
         message("Using Ninja generator for ${PROJECT}")
         set(MAKE_COMMAND ninja -j20)
-        
+
         # INSTALL_COMMAND might already set to be disabled 
         if(NOT ${${PROJECT}_NO_INSTALL})
             set(INSTALL_COMMAND ${MAKE_COMMAND} install)
@@ -63,6 +63,8 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
             CONFIGURE_COMMAND ${SET_ENV} cmake ${CONFIGURATION_OPTIONS_ALL} ${PATH}
             BUILD_COMMAND ${SET_ENV} ${MAKE_COMMAND}
         )
+
+        init_project(${PROJECT})
 
     endif()
 
@@ -104,7 +106,8 @@ macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
         write_variables_file()
 
         init_repository(${PROJECT})
-
+        init_project(${PROJECT})
+        
         add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
     else()

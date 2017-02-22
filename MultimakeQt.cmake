@@ -69,9 +69,9 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     set_package_defined(${PROJECT})
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
     read_qmake_properties(${PROJECT})
-    
+
     set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake ${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
-    
+
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
         SOURCE_DIR ${PATH}
@@ -83,6 +83,8 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         CONFIGURE_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND}
         BUILD_COMMAND ${SET_ENV} $(MAKE)
     )
+
+    init_project(${PROJECT})
 
     add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
@@ -119,6 +121,7 @@ macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
         )
 
         init_repository(${PROJECT})
+        init_project(${PROJECT})
 
         add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
 
@@ -208,6 +211,7 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
 
         set(${PROJECT}_init_repository_step_defined 1)
         init_repository(${PROJECT})
+        init_project(${PROJECT})
 
         add_deployment_steps(${PROJECT} "$(MAKE);install;INSTALL_ROOT=${DEPLOYMENT_PATH}")
 

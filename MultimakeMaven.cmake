@@ -49,18 +49,18 @@ endmacro()
 
 
 macro(add_maven_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
-    
+
     validate_git_commit(${PROJECT})
     read_common_properties(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
-        
+
         set_package_defined_with_git_repository(${PROJECT})
-        
+
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-        
+
         set(SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PROJECT})
-        
+
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${SOURCE_DIR}
@@ -74,17 +74,17 @@ macro(add_maven_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
             BUILD_COMMAND ""
             GIT_TAG ${${PROJECT}_GIT_COMMIT}
         )
-        
+
         ExternalProject_Add_Step(${PROJECT} installd
             COMMAND ${SET_ENV} mvn install ${MAVEN_OPTIONS}
             DEPENDEES configure
             WORKING_DIRECTORY ${SOURCE_DIR}/${PATH}
             ALWAYS 0
         )
-          
+
         write_variables_file()
         init_repository(${PROJECT})
-        
+
     endif()
-    
+
 endmacro()

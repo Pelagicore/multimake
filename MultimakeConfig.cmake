@@ -119,6 +119,9 @@ macro(init_repository PROJECT)
         )
     endif()
 
+    file(GENERATE OUTPUT manifest/${PROJECT}.version CONTENT "$<TARGET_PROPERTY:${PROJECT},VERSION_INFO>")
+#    append_version_information(${PROJECT} "commit : ${${PROJECT}_GIT_COMMIT}\n")
+
     set(${PROJECT}_init_repository_step_defined 1)
 
 endmacro()
@@ -281,6 +284,42 @@ macro(read_common_properties PROJECT)
 endmacro()
 
 
+function(append_target_property PROJECT PROPERTY_NAME VALUE)
+    get_property(CURRENT_VALUE TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME})
+    set(NEW_VALUE ${CURRENT_VALUE} ${VALUE})
+    set_property(TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME} ${NEW_VALUE})
+
+    get_property(CURRENT_VALUE TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME})
+    message("${PROPERTY_NAME}: ${CURRENT_VALUE}")
+
+endfunction()
+
+
+function(init_project PROJECT)
+
+    # Add a step which creates a GIT summary so that we know what version of the package has been built  
+    set(GIT_INFO_FILE ${CMAKE_BINARY_DIR}/manifest/${PROJECT}.git_info)
+    get_property(PATCH_COMMANDS TARGET ${PROJECT} PROPERTY PATCH_COMMANDS)
+    ExternalProject_Get_Property(${PROJECT} source_dir)
+    set(SEPARATOR_COMMAND COMMAND echo "--------------------------------------------------" >> ${GIT_INFO_FILE})
+    ExternalProject_Add_Step(${PROJECT} git_info
+        DEPENDEES build
+        WORKING_DIRECTORY ${source_dir}
+
+        COMMAND git remote -v > ${GIT_INFO_FILE}
+        ${SEPARATOR_COMMAND}
+        COMMAND echo "Patches:" >> ${GIT_INFO_FILE}
+        COMMAND echo "${PATCH_COMMANDS}" >> ${GIT_INFO_FILE}
+        ${SEPARATOR_COMMAND}
+        COMMAND git status >> ${GIT_INFO_FILE}
+        ${SEPARATOR_COMMAND}
+        COMMAND git log -10 >> ${GIT_INFO_FILE}
+        ${SEPARATOR_COMMAND}
+    )
+
+endfunction()
+
+
 function(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
 
     if(NOT DEFINED ${PROJECT}_init_repository_step_defined)
@@ -300,14 +339,15 @@ function(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
 
     ExternalProject_Add_step(${PROJECT}
         patch_${PATCH_COUNT}
-        DEPENDEES init_repository
-        DEPENDEES ${ADDITIONAL_DEPENDEES}
+        DEPENDEES init_repository ${ADDITIONAL_DEPENDEES}
         DEPENDERS configure
         WORKING_DIRECTORY ${PROJECTS_DOWNLOAD_DIR}/${PROJECT}/${SUB_FOLDER}
         COMMAND echo Patching ${PROJECT}
         COMMAND ${_COMMAND}
         ALWAYS 0
     )
+
+    append_target_property(${PROJECT} PATCH_COMMANDS "cd ${SUB_FOLDER} && ${COMMAND_STRING}")
 
     set_property(TARGET ${PROJECT} PROPERTY PATCH_COUNT ${PATCH_COUNT})
 
