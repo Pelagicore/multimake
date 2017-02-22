@@ -373,3 +373,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/MultimakeAutotools.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/MultimakeQt.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/MultimakeCMake.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/MultimakeMaven.cmake)
+
+
+configure_file(${CMAKE_CURRENT_LIST_DIR}/environment.in ${CMAKE_BINARY_DIR}/environment @ONLY)
