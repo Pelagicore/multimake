@@ -75,6 +75,7 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
         SOURCE_DIR ${PATH}
+        BINARY_DIR ${BINARY_DIR}
         PREFIX ${PROJECT}
         ${${PROJECT}_BUILD_ALWAYS_OPTION}
         DOWNLOAD_COMMAND ""
@@ -110,6 +111,7 @@ macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
+            BINARY_DIR ${BINARY_DIR}
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
             GIT_REPOSITORY ${REPOSITORY_URL}
@@ -189,6 +191,7 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
+            BINARY_DIR ${BINARY_DIR}
             GIT_REPOSITORY ${REPOSITORY_URL}
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}

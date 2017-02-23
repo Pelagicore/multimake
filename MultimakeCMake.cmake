@@ -56,6 +56,7 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PATH}
+            BINARY_DIR ${BINARY_DIR}
             DOWNLOAD_COMMAND ""
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
@@ -94,6 +95,7 @@ macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PROJECT}
+            BINARY_DIR ${BINARY_DIR}
             GIT_REPOSITORY ${REPOSITORY_URL}
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}

@@ -32,6 +32,7 @@ include(GNUInstallDirs)
 include(ExternalProject)
 include(CTest)
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/manifest)
 
 set(COMMON_CMAKE_CONFIGURATION_OPTIONS ${COMMON_CMAKE_CONFIGURATION_OPTIONS})
 
@@ -118,9 +119,6 @@ macro(init_repository PROJECT)
             DEPENDERS configure
         )
     endif()
-
-    file(GENERATE OUTPUT manifest/${PROJECT}.version CONTENT "$<TARGET_PROPERTY:${PROJECT},VERSION_INFO>")
-#    append_version_information(${PROJECT} "commit : ${${PROJECT}_GIT_COMMIT}\n")
 
     set(${PROJECT}_init_repository_step_defined 1)
 
@@ -281,6 +279,8 @@ macro(read_common_properties PROJECT)
 
     set(DEPLOY_COMMAND $(MAKE) install)
 
+    set(BINARY_DIR ${CMAKE_BINARY_DIR}/${PROJECT}/build)
+
 endmacro()
 
 
@@ -288,10 +288,6 @@ function(append_target_property PROJECT PROPERTY_NAME VALUE)
     get_property(CURRENT_VALUE TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME})
     set(NEW_VALUE ${CURRENT_VALUE} ${VALUE})
     set_property(TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME} ${NEW_VALUE})
-
-    get_property(CURRENT_VALUE TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME})
-    message("${PROPERTY_NAME}: ${CURRENT_VALUE}")
-
 endfunction()
 
 
@@ -299,9 +295,12 @@ function(init_project PROJECT)
 
     # Add a step which creates a GIT summary so that we know what version of the package has been built  
     set(GIT_INFO_FILE ${CMAKE_BINARY_DIR}/manifest/${PROJECT}.git_info)
-    get_property(PATCH_COMMANDS TARGET ${PROJECT} PROPERTY PATCH_COMMANDS)
     ExternalProject_Get_Property(${PROJECT} source_dir)
+    ExternalProject_Get_Property(${PROJECT} binary_dir)
     set(SEPARATOR_COMMAND COMMAND echo "--------------------------------------------------" >> ${GIT_INFO_FILE})
+
+    file(GENERATE OUTPUT ${binary_dir}/patches CONTENT "$<TARGET_PROPERTY:${PROJECT},PATCH_COMMANDS>")
+
     ExternalProject_Add_Step(${PROJECT} git_info
         DEPENDEES build
         WORKING_DIRECTORY ${source_dir}
@@ -309,7 +308,7 @@ function(init_project PROJECT)
         COMMAND git remote -v > ${GIT_INFO_FILE}
         ${SEPARATOR_COMMAND}
         COMMAND echo "Patches:" >> ${GIT_INFO_FILE}
-        COMMAND echo "${PATCH_COMMANDS}" >> ${GIT_INFO_FILE}
+        COMMAND cat ${binary_dir}/patches >> ${GIT_INFO_FILE}
         ${SEPARATOR_COMMAND}
         COMMAND git status >> ${GIT_INFO_FILE}
         ${SEPARATOR_COMMAND}
@@ -347,7 +346,13 @@ function(add_patch PROJECT SUB_FOLDER COMMAND_STRING)
         ALWAYS 0
     )
 
-    append_target_property(${PROJECT} PATCH_COMMANDS "cd ${SUB_FOLDER} && ${COMMAND_STRING}")
+    if("${SUB_FOLDER}" STREQUAL "")
+        set(PATCH_COMMAND "${COMMAND_STRING}")
+    else()
+        set(PATCH_COMMAND "cd ${SUB_FOLDER} && ${COMMAND_STRING}\n")
+    endif()
+
+    append_target_property(${PROJECT} PATCH_COMMANDS ${PATCH_COMMAND})
 
     set_property(TARGET ${PROJECT} PROPERTY PATCH_COUNT ${PATCH_COUNT})
 

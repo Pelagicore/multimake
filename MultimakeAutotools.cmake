@@ -43,6 +43,7 @@ macro(add_autotools_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPT
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PATH}
+            BINARY_DIR ${BINARY_DIR}
             DOWNLOAD_COMMAND ""
             PREFIX ${PROJECT}
             ${${PROJECT}_BUILD_ALWAYS_OPTION}
@@ -98,6 +99,7 @@ macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CON
             ExternalProject_Add(${PROJECT}
                 DEPENDS ${DEPENDENCIES}
                 SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
+                BINARY_DIR ${BINARY_DIR}
                 PREFIX ${PROJECT}
                 ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 GIT_REPOSITORY ${REPOSITORY_URL}
@@ -154,19 +156,20 @@ macro(add_autotools_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CON
 endmacro()
 
 macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS MAKE_OPTIONS)
-    
+
     if(NOT ${PROJECT}_DEFINED)
-    
+
         set_package_defined(${PROJECT})
         set(CONFIGURE_COMMAND ${PATH}/${AUTOTOOLS_CONFIGURE_COMMAND} ${CONFIGURATION_OPTIONS})
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
         read_autotools_properties(${PROJECT})
-    
+
         if (NOT ${PROJECT}_IN_SOURCE_BUILD)
-            
+
             ExternalProject_Add(${PROJECT}
                 DEPENDS ${DEPENDENCIES}
                 SOURCE_DIR ${PATH}
+                BINARY_DIR ${BINARY_DIR}
                 PREFIX ${PROJECT}
                 ${${PROJECT}_BUILD_ALWAYS_OPTION}
                 DOWNLOAD_COMMAND ""
@@ -190,7 +193,7 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             )
             
         endif()
-    
+
         ExternalProject_Add_Step(${PROJECT} autoreconf_step
             COMMAND autoreconf -i
             DEPENDEES configure
@@ -198,9 +201,9 @@ macro(add_autotools_external_project_badconfigure PROJECT PATH DEPENDENCIES CONF
             WORKING_DIRECTORY <SOURCE_DIR>
             ALWAYS 0
         )
-        
+
         add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
-        
+
         write_variables_file()
 
     endif()

@@ -1,4 +1,4 @@
 
 # This script can be sourced to get environment variables set to access the installed packages
 export PATH=@CMAKE_INSTALL_PREFIX@/bin:$PATH
-export LD_LIBRARY_PATH=@CMAKE_INSTALL_PREFIX@/lib:$PATH
+export LD_LIBRARY_PATH=@CMAKE_INSTALL_PREFIX@/lib:$LD_LIBRARY_PATH
