@@ -32,6 +32,8 @@ include(GNUInstallDirs)
 include(ExternalProject)
 include(CTest)
 
+set(MULTIMAKE_FOLDER ${CMAKE_CURRENT_LIST_DIR})
+
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/manifest)
 
 set(COMMON_CMAKE_CONFIGURATION_OPTIONS ${COMMON_CMAKE_CONFIGURATION_OPTIONS})
@@ -110,6 +112,20 @@ macro(set_package_defined_with_git_repository PROJECT)
     set_package_defined(${PROJECT})
 endmacro()
 
+
+set(UP_TO_DATE_CHECK_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake/MultimakeCheck)
+
+file(MAKE_DIRECTORY ${UP_TO_DATE_CHECK_PATH})
+
+add_custom_target(up_to_date_check_package_list)
+
+file(GENERATE OUTPUT ${UP_TO_DATE_CHECK_PATH}/MultimakeCheckConfig.cmake CONTENT "
+add_custom_target(_check_dummy)
+foreach(PACKAGE_NAME $<TARGET_PROPERTY:up_to_date_check_package_list,CONTENT>)
+    include(${UP_TO_DATE_CHECK_PATH}/Check_\${PACKAGE_NAME}.cmake)
+endforeach()
+")
+
 macro(init_repository PROJECT)
 
     if(NOT DEFINED ${PROJECT}_init_repository_step_defined)
@@ -123,6 +139,8 @@ macro(init_repository PROJECT)
     set(${PROJECT}_init_repository_step_defined 1)
 
 endmacro()
+
+
 
 
 macro(add_available_package PROJECT)
@@ -149,7 +167,7 @@ endmacro()
 
 macro(append_to_variables PROJECT)
     if(ENABLE_UNINSTALLED_PKG_CONFIG)
-        set(PKG_CONFIG_PATH ${CMAKE_BINARY_DIR}/${PROJECT}-prefix/src/${PROJECT}-build:${PKG_CONFIG_PATH})
+        set(PKG_CONFIG_PATH "${CMAKE_BINARY_DIR}/${PROJECT}-prefix/src/${PROJECT}-build:${PKG_CONFIG_PATH}")
     endif()
 endmacro()
 
@@ -203,14 +221,14 @@ endmacro()
 
 
 # This macro can be used to simply clone a repository and add operations manually via "ExternalProject_Add_Step"
-macro(add_no_build_external_project PROJECT REPOSITORY_URL DEPENDENCIES)
+macro(add_no_build_external_project PROJECT REPOSITORY_URL)
 
     validate_git_commit(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
 
         set_package_defined_with_git_repository(${PROJECT})
-        add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
+#        add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
         check_dependencies_existence(${PROJECT} "${DEPENDENCIES}")
         append_to_variables(${PROJECT})
 
@@ -279,7 +297,7 @@ macro(read_common_properties PROJECT)
 
     set(DEPLOY_COMMAND $(MAKE) install)
 
-    set(BINARY_DIR ${CMAKE_BINARY_DIR}/${PROJECT}/build)
+    set(BINARY_DIR "${CMAKE_BINARY_DIR}/${PROJECT}/build")
 
 endmacro()
 
@@ -288,6 +306,48 @@ function(append_target_property PROJECT PROPERTY_NAME VALUE)
     get_property(CURRENT_VALUE TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME})
     set(NEW_VALUE ${CURRENT_VALUE} ${VALUE})
     set_property(TARGET ${PROJECT} PROPERTY ${PROPERTY_NAME} ${NEW_VALUE})
+endfunction()
+
+
+function(add_up_to_date_check_folder TARGET_NAME PATH)
+
+    # write a file identifying the version which we built
+    add_custom_target(${TARGET_NAME} ALL
+        WORKING_DIRECTORY ${PATH}
+        COMMAND git log -1 . > ${UP_TO_DATE_CHECK_PATH}/${TARGET_NAME}.gitlog
+    )
+
+    set(TARGET_NAME ${TARGET_NAME})  # needed for the configure_file command
+    set(REPOSITORY_FOLDER ${PATH})  # needed for the configure_file command
+   
+    configure_file(${MULTIMAKE_FOLDER}/MultimakeCheck.cmake ${UP_TO_DATE_CHECK_PATH}/Check_${TARGET_NAME}.cmake @ONLY)
+
+    append_target_property(up_to_date_check_package_list CONTENT ${TARGET_NAME})
+
+endfunction()
+
+
+function(add_up_to_date_check_project PROJECT)
+    ExternalProject_Get_Property(${PROJECT} source_dir)
+   
+    # write a file identifying the version which we built
+    ExternalProject_Add_Step(${PROJECT} write_git_sha
+        DEPENDEES install
+        WORKING_DIRECTORY ${source_dir}
+        COMMAND git log -1 . > ${UP_TO_DATE_CHECK_PATH}/${PROJECT}.gitlog
+    )
+
+    get_property(DEPS TARGET ${PROJECT} PROPERTY _EP_DEPENDS)
+    foreach(DEP ${DEPS})
+        set(DEPENDENCIES ${DEPENDENCIES} check_${DEP})
+    endforeach()
+
+    set(TARGET_NAME ${PROJECT})  # needed for the configure_file command
+    set(REPOSITORY_FOLDER ${source_dir})  # needed for the configure_file command
+    configure_file(${MULTIMAKE_FOLDER}/MultimakeCheck.cmake ${UP_TO_DATE_CHECK_PATH}/Check_${PROJECT}.cmake @ONLY)
+
+    append_target_property(up_to_date_check_package_list CONTENT ${PROJECT})
+
 endfunction()
 
 
@@ -315,6 +375,10 @@ function(init_project PROJECT)
         COMMAND git log -10 >> ${GIT_INFO_FILE}
         ${SEPARATOR_COMMAND}
     )
+
+    if (NOT ${PROJECT}_DISABLE_UP_TO_DATE_CHECK)
+        add_up_to_date_check_project(${PROJECT})
+    endif()
 
 endfunction()
 
