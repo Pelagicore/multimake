@@ -138,9 +138,9 @@ endmacro()
 macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
     
     read_common_properties(${PROJECT})
-    
+
     if(NOT ${PROJECT}_DEFINED)
-    
+
         # We build Qt ourselves => point to that Qt to build other packages
         set(QT_PATH ${${PROJECT}_INSTALL_PREFIX})
         
@@ -148,7 +148,7 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};${CONFIGURATION_OPTIONS}" )
+        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};-prefix;${${PROJECT}_INSTALL_PREFIX};${CONFIGURATION_OPTIONS}" )
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
@@ -186,7 +186,7 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};${CONFIGURATION_OPTIONS}" )
+        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};-prefix;${${PROJECT}_INSTALL_PREFIX};${CONFIGURATION_OPTIONS}" )
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
