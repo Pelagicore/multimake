@@ -28,7 +28,7 @@ macro(read_cmake_properties PROJECT)
 
         # INSTALL_COMMAND might already set to be disabled 
         if(NOT ${${PROJECT}_NO_INSTALL})
-            set(INSTALL_COMMAND ${MAKE_COMMAND} install)
+            set(INSTALL_COMMAND INSTALL_COMMAND ${MAKE_COMMAND} install)
         endif()
 
         set(DEPLOY_COMMAND DESTDIR=${DEPLOYMENT_PATH} ninja install)

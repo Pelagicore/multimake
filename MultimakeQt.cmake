@@ -35,14 +35,14 @@ endmacro()
 
 
 macro(locate_qt)
-    
+
     if(NOT DEFINED QT_PATH)
-        
+
         execute_process(COMMAND which qmake
             OUTPUT_VARIABLE QT_PATH
             RESULT_VARIABLE RES
         )
-        
+
         if(RES EQUAL 0)
         
             get_filename_component(QT_PATH ${QT_PATH} DIRECTORY)
@@ -52,10 +52,12 @@ macro(locate_qt)
             
             set(QT_CMAKE_PATH ${QT_PATH}/lib/cmake)
             set(QT_CMAKE_OPTIONS -DCMAKE_PREFIX_PATH=${QT_CMAKE_PATH})
-            
+
         else()
             message( FATAL_ERROR "A \"qmake\" executable could not be found in your $PATH => Unable to build Qt-based packages !") 
         endif()
+
+    else()
         
     endif()
 

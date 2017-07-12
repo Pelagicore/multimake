@@ -273,6 +273,10 @@ macro(read_common_properties PROJECT)
         endif()
     endif()
 
+    if(NOT DEFINED ${PROJECT}_NO_INSTALL)
+        set(${PROJECT}_NO_INSTALL 0)
+    endif()
+
     if(${${PROJECT}_NO_INSTALL})
         set(INSTALL_COMMAND INSTALL_COMMAND echo Installation of ${PROJECT} is disabled)
     else()
