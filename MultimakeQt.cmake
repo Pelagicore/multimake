@@ -36,30 +36,56 @@ endmacro()
 
 macro(locate_qt)
 
-    if(NOT DEFINED QT_PATH)
-
-        execute_process(COMMAND which qmake
-            OUTPUT_VARIABLE QT_PATH
-            RESULT_VARIABLE RES
-        )
-
-        if(RES EQUAL 0)
+    if (QT_BUILD_ENABLED)
         
-            get_filename_component(QT_PATH ${QT_PATH} DIRECTORY)
-            get_filename_component(QT_PATH ${QT_PATH} DIRECTORY)
-            
-            message("Qt installation located in ${QT_PATH} ${RES}")
-            
-            set(QT_CMAKE_PATH ${QT_PATH}/lib/cmake)
-            set(QT_CMAKE_OPTIONS -DCMAKE_PREFIX_PATH=${QT_CMAKE_PATH})
+        # We build Qt ourselves => just use it
 
-        else()
-            message( FATAL_ERROR "A \"qmake\" executable could not be found in your $PATH => Unable to build Qt-based packages !") 
-        endif()
+        # We assume the Qt cmake stuff is in that folder
+        set(QT_CMAKE_PATH ${QT_PATH}/lib/cmake)
 
     else()
+        # We do not build Qt ourselves. The QT_PATH variable might point to a custom Qt installation
+        if(DEFINED QT_PATH)
         
+            execute_process(COMMAND ${QT_PATH}/bin/qmake -query QT_INSTALL_LIBS
+                OUTPUT_VARIABLE QT_LIB_PATH
+                RESULT_VARIABLE RES
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+
+            if(RES EQUAL 0)
+                set(QT_CMAKE_PATH "${QT_LIB_PATH}/cmake")
+            else()
+                message(FATAL_ERROR "Error invoking ${QT_PATH}/bin/qmake") 
+            endif()
+
+        else()
+
+            # Just try to call qmake so we find it if it is on the PATH
+            execute_process(COMMAND qmake -query QT_INSTALL_LIBS
+                OUTPUT_VARIABLE QT_PATH
+                RESULT_VARIABLE RES
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+
+            if(RES EQUAL 0)
+
+                get_filename_component(QT_PATH ${QT_PATH} DIRECTORY)
+                get_filename_component(QT_PATH ${QT_PATH} DIRECTORY)
+
+                message("Qt installation located in ${QT_PATH} ${RES}")
+
+                set(QT_CMAKE_PATH ${QT_PATH}/lib/cmake)
+
+            else()
+                message(FATAL_ERROR "A \"qmake\" executable could not be found in your $PATH => Unable to build Qt-based packages !") 
+            endif()
+
+        endif()
+    
     endif()
+    
+    set(QT_CMAKE_OPTIONS -DCMAKE_PREFIX_PATH=${QT_CMAKE_PATH})
 
 endmacro()
 
@@ -145,7 +171,8 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
 
         # We build Qt ourselves => point to that Qt to build other packages
         set(QT_PATH ${${PROJECT}_INSTALL_PREFIX})
-        
+        set(QT_BUILD_ENABLED ON)
+
         set_package_defined(${PROJECT})
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
@@ -183,6 +210,7 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
 
         # We build Qt ourselves => point to that Qt to build other packages
         set(QT_PATH ${${PROJECT}_INSTALL_PREFIX})
+        set(QT_BUILD_ENABLED ON)
 
         set_package_defined_with_git_repository(${PROJECT})
 
