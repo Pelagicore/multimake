@@ -17,7 +17,6 @@
 #
 # For further information see LICENSE
 
-
 set(QT_STANDARD_CONFIGURE_PROPERTIES "-opensource;-confirm-license")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -36,59 +35,45 @@ endmacro()
 
 macro(locate_qt)
 
-    if (QT_BUILD_ENABLED)
-        
-        # We build Qt ourselves => just use it
+    if (NOT DEFINED QT_QMAKE_PATH)
 
-        # We assume the Qt cmake stuff is in that folder
-        set(QT_CMAKE_PATH ${QT_PATH}/lib/cmake)
+        execute_process(COMMAND which qmake
+            OUTPUT_VARIABLE QT_QMAKE_PATH
+            RESULT_VARIABLE RES
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
 
-    else()
-        # We do not build Qt ourselves. The QT_PATH variable might point to a custom Qt installation
-        if(DEFINED QT_PATH)
-        
-            execute_process(COMMAND ${QT_PATH}/bin/qmake -query QT_INSTALL_LIBS
-                OUTPUT_VARIABLE QT_LIB_PATH
-                RESULT_VARIABLE RES
-                OUTPUT_STRIP_TRAILING_WHITESPACE
-            )
-
-            if(RES EQUAL 0)
-                set(QT_CMAKE_PATH "${QT_LIB_PATH}/cmake")
-            else()
-                message(FATAL_ERROR "Error invoking ${QT_PATH}/bin/qmake") 
-            endif()
-
+        if(RES EQUAL 0)
+            message("qmake path ${QT_QMAKE_PATH}")
         else()
-
-            # Just try to call qmake so we find it if it is on the PATH
-            execute_process(COMMAND qmake -query QT_INSTALL_LIBS
-                OUTPUT_VARIABLE QT_PATH
-                RESULT_VARIABLE RES
-                OUTPUT_STRIP_TRAILING_WHITESPACE
-            )
-
-            if(RES EQUAL 0)
-
-                get_filename_component(QT_PATH ${QT_PATH} DIRECTORY)
-                get_filename_component(QT_PATH ${QT_PATH} DIRECTORY)
-
-                message("Qt installation located in ${QT_PATH} ${RES}")
-
-                set(QT_CMAKE_PATH ${QT_PATH}/lib/cmake)
-
-            else()
-                message(FATAL_ERROR "A \"qmake\" executable could not be found in your $PATH => Unable to build Qt-based packages !") 
-            endif()
-
+            message(FATAL "Could not find qmake executable. Set the QT_QMAKE_PATH variable.")
         endif()
-    
+
     endif()
-    
-    set(QT_CMAKE_OPTIONS -DCMAKE_PREFIX_PATH=${QT_CMAKE_PATH})
+
+    if (NOT DEFINED QT_CMAKE_OPTIONS)
+
+        execute_process(COMMAND ${QT_QMAKE_PATH} -query QT_INSTALL_LIBS
+            OUTPUT_VARIABLE QT_LIBS_PATH
+            RESULT_VARIABLE RES
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        if(NOT RES EQUAL 0)
+            message(FATAL_ERROR "Error invoking ${QT_QMAKE_PATH}") 
+        endif()
+
+        set(QT_CMAKE_OPTIONS "-DCMAKE_PREFIX_PATH=${QT_LIBS_PATH}/cmake")
+
+    endif()
 
 endmacro()
 
+
+macro(multimake_find_qt PACKAGE_NAME)
+    locate_qt()
+    add_available_package(${PACKAGE_NAME})
+endmacro()
 
 
 macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS)
@@ -98,7 +83,7 @@ macro(add_qmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
     read_qmake_properties(${PROJECT})
 
-    set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake ${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
+    set(CONFIGURE_COMMAND ${QT_QMAKE_PATH} ${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
 
     ExternalProject_Add(${PROJECT}
         DEPENDS ${DEPENDENCIES}
@@ -133,9 +118,9 @@ macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
     
         set_package_defined_with_git_repository(${PROJECT})
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
-        
-        set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake ${PROJECTS_DOWNLOAD_DIR}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
-        
+
+        set(CONFIGURE_COMMAND ${QT_QMAKE_PATH} ${PROJECTS_DOWNLOAD_DIR}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
+
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
             SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
@@ -163,21 +148,28 @@ macro(add_qmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGU
 endmacro()
 
 
+macro(set_qt_location INSTALL_PREFIX)
+    set(QT_QMAKE_PATH ${INSTALL_PREFIX}/bin/qmake)
+    set(QT_CMAKE_OPTIONS "-DCMAKE_PREFIX_PATH=${INSTALL_PREFIX}/lib/cmake")
+    message("QT_QMAKE_PATH=${QT_QMAKE_PATH}")
+    message("QT_CMAKE_OPTIONS=${QT_CMAKE_OPTIONS}")
+endmacro()
+
+
 macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
-    
+
     read_common_properties(${PROJECT})
 
     if(NOT ${PROJECT}_DEFINED)
 
         # We build Qt ourselves => point to that Qt to build other packages
-        set(QT_PATH ${${PROJECT}_INSTALL_PREFIX})
-        set(QT_BUILD_ENABLED ON)
+        set_qt_location(${${PROJECT}_INSTALL_PREFIX})
 
         set_package_defined(${PROJECT})
 
         add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
 
-        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};-prefix;${${PROJECT}_INSTALL_PREFIX};${CONFIGURATION_OPTIONS}" )
+        set(CONFIGURE_CMD configure "${QT_STANDARD_CONFIGURE_PROPERTIES};-prefix;${${PROJECT}_INSTALL_PREFIX};${CONFIGURATION_OPTIONS};" )
 
         ExternalProject_Add(${PROJECT}
             DEPENDS ${DEPENDENCIES}
@@ -191,11 +183,11 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
             CONFIGURE_COMMAND ${SET_ENV} <SOURCE_DIR>/${CONFIGURE_CMD}
             BUILD_COMMAND ${SET_ENV} $(MAKE)
         )
-        
+
         add_deployment_steps(${PROJECT} "$(MAKE);install;INSTALL_ROOT=${DEPLOYMENT_PATH}")
-        
+
         write_variables_file()
-    
+
     endif()
     
 endmacro()
@@ -209,8 +201,7 @@ macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOS
     if(NOT ${PROJECT}_DEFINED)
 
         # We build Qt ourselves => point to that Qt to build other packages
-        set(QT_PATH ${${PROJECT}_INSTALL_PREFIX})
-        set(QT_BUILD_ENABLED ON)
+        set_qt_location(${${PROJECT}_INSTALL_PREFIX})
 
         set_package_defined_with_git_repository(${PROJECT})
 

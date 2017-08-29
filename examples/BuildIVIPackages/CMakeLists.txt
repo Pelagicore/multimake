@@ -21,9 +21,10 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-PROJECT(BuildIVIPackages)
+project(BuildIVIPackages)
 
-find_package(Multimake REQUIRED)
+find_package(Multimake REQUIRED HINTS ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
-find_layer(Ubuntu REQUIRED)
-find_layer(IVI REQUIRED)
+add_cmake_external_git_project(dlt "https://github.com/Pelagicore/dlt.git" "" "-DWITH_DLT_DBUS=OFF")
+add_cmake_external_git_project(ivi-logging "https://github.com/Pelagicore/ivi-logging.git" "dlt" "-DENABLE_DLT_BACKEND=ON")
+add_cmake_external_git_project(ivi-main-loop "https://github.com/Pelagicore/MainLoop.git" "" "")

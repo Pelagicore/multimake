@@ -76,8 +76,6 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
 endmacro()
 
 
-
-
 macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
 
     validate_git_commit(${PROJECT})
