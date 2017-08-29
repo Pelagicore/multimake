@@ -65,6 +65,8 @@ endif()
 
 option(ENABLE_DEDICATED_INSTALLATION "Enable installation of every package in its own installation folder" OFF)
 
+option(ENABLE_UP_TO_DATE_CHECK "Enable the generation of files needed to check if the build folder is up to date" OFF)
+
 
 if(WITH_ICECC)
     message("icecc enabled")
@@ -89,7 +91,7 @@ if(WITH_CLANG)
 endif()
 
 
-option( ENABLE_UNINSTALLED_PKG_CONFIG "Enable the use of the uninstalled pkg-config file variants" OFF )
+option(ENABLE_UNINSTALLED_PKG_CONFIG "Enable the use of the uninstalled pkg-config file variants" OFF)
 
 option(ALWAYS_BUILD "Always build or install the projects by default, even if they have been sucessfully installed already" ON)
 
@@ -113,18 +115,20 @@ macro(set_package_defined_with_git_repository PROJECT)
 endmacro()
 
 
-set(UP_TO_DATE_CHECK_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake/MultimakeCheck)
+if(ENABLE_UP_TO_DATE_CHECK)
+    set(UP_TO_DATE_CHECK_PATH ${CMAKE_INSTALL_PREFIX}/lib/cmake/MultimakeCheck)
+    file(MAKE_DIRECTORY ${UP_TO_DATE_CHECK_PATH})
 
-file(MAKE_DIRECTORY ${UP_TO_DATE_CHECK_PATH})
+    add_custom_target(up_to_date_check_package_list)
 
-add_custom_target(up_to_date_check_package_list)
+    file(GENERATE OUTPUT ${UP_TO_DATE_CHECK_PATH}/MultimakeCheckConfig.cmake CONTENT "
+    add_custom_target(_check_dummy)
+    foreach(PACKAGE_NAME $<TARGET_PROPERTY:up_to_date_check_package_list,CONTENT>)
+        include(${UP_TO_DATE_CHECK_PATH}/Check_\${PACKAGE_NAME}.cmake)
+    endforeach()
+    ")
+endif()
 
-file(GENERATE OUTPUT ${UP_TO_DATE_CHECK_PATH}/MultimakeCheckConfig.cmake CONTENT "
-add_custom_target(_check_dummy)
-foreach(PACKAGE_NAME $<TARGET_PROPERTY:up_to_date_check_package_list,CONTENT>)
-    include(${UP_TO_DATE_CHECK_PATH}/Check_\${PACKAGE_NAME}.cmake)
-endforeach()
-")
 
 macro(init_repository PROJECT)
 
@@ -332,25 +336,28 @@ endfunction()
 
 
 function(add_up_to_date_check_project PROJECT)
-    ExternalProject_Get_Property(${PROJECT} source_dir)
-   
-    # write a file identifying the version which we built
-    ExternalProject_Add_Step(${PROJECT} write_git_sha
-        DEPENDEES install
-        WORKING_DIRECTORY ${source_dir}
-        COMMAND git log -1 . > ${UP_TO_DATE_CHECK_PATH}/${PROJECT}.gitlog
-    )
 
-    get_property(DEPS TARGET ${PROJECT} PROPERTY _EP_DEPENDS)
-    foreach(DEP ${DEPS})
-        set(DEPENDENCIES ${DEPENDENCIES} check_${DEP})
-    endforeach()
+    if (ENABLE_UP_TO_DATE_CHECK)
+        ExternalProject_Get_Property(${PROJECT} source_dir)
 
-    set(TARGET_NAME ${PROJECT})  # needed for the configure_file command
-    set(REPOSITORY_FOLDER ${source_dir})  # needed for the configure_file command
-    configure_file(${MULTIMAKE_FOLDER}/MultimakeCheck.cmake ${UP_TO_DATE_CHECK_PATH}/Check_${PROJECT}.cmake @ONLY)
+        # write a file identifying the version which we built
+        ExternalProject_Add_Step(${PROJECT} write_git_sha
+            DEPENDEES install
+            WORKING_DIRECTORY ${source_dir}
+            COMMAND git log -1 . > ${UP_TO_DATE_CHECK_PATH}/${PROJECT}.gitlog
+        )
 
-    append_target_property(up_to_date_check_package_list CONTENT ${PROJECT})
+        get_property(DEPS TARGET ${PROJECT} PROPERTY _EP_DEPENDS)
+        foreach(DEP ${DEPS})
+            set(DEPENDENCIES ${DEPENDENCIES} check_${DEP})
+        endforeach()
+
+        set(TARGET_NAME ${PROJECT})  # needed for the configure_file command
+        set(REPOSITORY_FOLDER ${source_dir})  # needed for the configure_file command
+        configure_file(${MULTIMAKE_FOLDER}/MultimakeCheck.cmake ${UP_TO_DATE_CHECK_PATH}/Check_${PROJECT}.cmake @ONLY)
+
+        append_target_property(up_to_date_check_package_list CONTENT ${PROJECT})
+    endif()
 
 endfunction()
 
