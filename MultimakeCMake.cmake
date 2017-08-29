@@ -28,7 +28,7 @@ macro(read_cmake_properties PROJECT)
 
         # INSTALL_COMMAND might already set to be disabled 
         if(NOT ${${PROJECT}_NO_INSTALL})
-            set(INSTALL_COMMAND ${MAKE_COMMAND} install)
+            set(INSTALL_COMMAND INSTALL_COMMAND ${MAKE_COMMAND} install)
         endif()
 
         set(DEPLOY_COMMAND DESTDIR=${DEPLOYMENT_PATH} ninja install)
@@ -74,8 +74,6 @@ macro(add_cmake_external_project PROJECT PATH DEPENDENCIES CONFIGURATION_OPTIONS
     write_variables_file()
 
 endmacro()
-
-
 
 
 macro(add_cmake_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
