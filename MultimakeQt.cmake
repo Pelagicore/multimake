@@ -171,6 +171,34 @@ macro(add_qt_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES INIT_
     
 endmacro()
 
+macro(add_qmake_external_tgz_project PROJECT PATH REPOSITORY_URL DEPENDENCIES CONFIGURATION_OPTIONS)
+    
+    locate_qt()
+    set_package_defined(${PROJECT})
+    add_dependencies_target(${PROJECT} "${DEPENDENCIES}")
+    read_qmake_properties(${PROJECT})
+
+    set(CONFIGURE_COMMAND ${QT_PATH}/bin/qmake ${PROJECTS_DOWNLOAD_DIR}/${PATH} ${QMAKE_COMMON_CONFIGURATION_OPTIONS} ${CONFIGURATION_OPTIONS})
+    
+    ExternalProject_Add(${PROJECT}
+        DEPENDS ${DEPENDENCIES}
+        PREFIX ${PROJECT}
+        ${${PROJECT}_BUILD_ALWAYS_OPTION}
+
+        SOURCE_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
+        BINARY_DIR ${PROJECTS_DOWNLOAD_DIR}/${PATH}
+        URL ${REPOSITORY_URL}
+        UPDATE_COMMAND ""
+        ${INSTALL_COMMAND}
+        CONFIGURE_COMMAND ${SET_ENV} ${CONFIGURE_COMMAND}
+        BUILD_COMMAND ${SET_ENV} $(MAKE)
+    )
+        
+    add_deployment_steps(${PROJECT} "${DEPLOY_COMMAND}")
+
+    write_variables_file()
+
+endmacro()
 
 macro(add_qt_external_git_project PROJECT REPOSITORY_URL DEPENDENCIES INIT_REPOSITORY_OPTIONS CONFIGURATION_OPTIONS)
 
